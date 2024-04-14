@@ -13,11 +13,22 @@ conn = mysql.connector.connect(
 )
 cursor = conn.cursor()
 # Página inicial - Lista de clientes
-@app.route('/')
+@app.route('/lista_clientes')
 def listar_clientes():
     cursor.execute("SELECT * FROM cliente")
     rows = cursor.fetchall()
     return render_template('lista_clientes.html', clientes=rows)
+
+@app.route('/')
+def home():
+    cursor.execute("SELECT * FROM cliente")
+    rows = cursor.fetchall()
+    return render_template('index.html', clientes=rows)
+
+@app.route('/dashboard')
+def dashboard():
+    
+    return render_template('dashboard.html')
 
 # Página para cadastrar um novo cliente
 @app.route('/cadastrar', methods=['GET', 'POST'])
@@ -42,7 +53,7 @@ def excluir_cliente(cliente_id):
     cursor.execute("DELETE FROM cliente WHERE id = %s", (cliente_id,))
     conn.commit()
 
-    return redirect(url_for('listar_clientes'))
+    return redirect(url_for('lista_clientes'))
 
 @app.route('/editar/<int:cliente_id>', methods=['GET', 'POST'])
 def editar_cliente(cliente_id):
@@ -57,7 +68,7 @@ def editar_cliente(cliente_id):
         cursor.execute(sql, (nome, email, telefone, cliente_id))
         conn.commit()
 
-        return redirect(url_for('listar_clientes'))
+        return redirect(url_for('lista_clientes'))
 
     # Se for uma requisição GET, exibir o formulário de edição
     sql = "SELECT * FROM cliente WHERE id = %s"
@@ -65,7 +76,114 @@ def editar_cliente(cliente_id):
     cliente = cursor.fetchone()
     return render_template('editar_cliente.html', cliente=cliente)
 
+# Rota para cadastrar venda
+@app.route('/cadastrar_venda', methods=['GET', 'POST'])
+def cadastrar_venda():
+    if request.method == 'POST':
+        produto_id = request.form['produto_id']
+        cliente_id = request.form['cliente_id']
+        quantidade = request.form['quantidade']
+        total = request.form['total']
 
+        # Insira aqui o código para inserir a venda no banco de dados
+
+        return redirect(url_for('lista_clientes'))
+
+    # Consulta para obter a lista de produtos
+    cursor.execute("SELECT id, nome FROM produtos")
+    produtos = cursor.fetchall()
+
+    # Consulta para obter a lista de clientes
+    cursor.execute("SELECT id, nome FROM cliente")
+    clientes = cursor.fetchall()
+
+    return render_template('cadastrar_venda.html', produtos=produtos, clientes=clientes)
+
+# Página para editar uma venda
+@app.route('/editar_venda/<int:venda_id>', methods=['GET', 'POST'])
+def editar_venda(venda_id):
+    if request.method == 'POST':
+        produto_id = request.form['produto_id']
+        cliente_id = request.form['cliente_id']
+        quantidade = request.form['quantidade']
+        total = request.form['total']
+
+        cursor.execute("UPDATE vendas SET produto_id=%s, cliente_id=%s, quantidade=%s, total=%s WHERE id=%s",
+                       (produto_id, cliente_id, quantidade, total, venda_id))
+        conn.commit()
+
+        return redirect(url_for('listar_vendas'))
+
+    cursor.execute("SELECT * FROM vendas WHERE id=%s", (venda_id,))
+    venda = cursor.fetchone()
+    cursor.execute("SELECT id, nome FROM produtos")
+    produtos = cursor.fetchall()
+    cursor.execute("SELECT id, nome FROM cliente")
+    clientes = cursor.fetchall()
+
+    return render_template('editar_venda.html', venda=venda, produtos=produtos, clientes=clientes)
+
+# Rota para excluir uma venda
+@app.route('/excluir_venda/<int:venda_id>', methods=['GET'])
+def excluir_venda(venda_id):
+    cursor.execute("DELETE FROM vendas WHERE id=%s", (venda_id,))
+    conn.commit()
+    return redirect(url_for('listar_vendas'))
+
+# Página para listar todas as vendas
+@app.route('/lista_vendas')
+def listar_vendas():
+    cursor.execute("SELECT * FROM vendas")
+    vendas = cursor.fetchall()
+    return render_template('lista_vendas.html', vendas=vendas)
+
+# Página inicial - Lista de produtos
+@app.route('/lista_produtos')
+def listar_produtos():
+    cursor.execute("SELECT * FROM produtos")
+    rows = cursor.fetchall()
+    return render_template('lista_produtos.html', produtos=rows)
+
+# Rota para cadastrar um novo produto
+@app.route('/cadastrar_produto', methods=['GET', 'POST'])
+def cadastrar_produto():
+    if request.method == 'POST':
+        nome = request.form['nome']
+        descricao = request.form['descricao']
+        preco = request.form['preco']
+
+        sql = "INSERT INTO produtos (nome, descricao, preco) VALUES (%s, %s, %s)"
+        cursor.execute(sql, (nome, descricao, preco))
+        conn.commit()
+
+        return redirect(url_for('listar_produtos'))
+    return render_template('cadastrar_produto.html')
+
+# Rota para editar um produto
+@app.route('/editar_produto/<int:id>', methods=['GET', 'POST'])
+def editar_produto(id):
+    if request.method == 'POST':
+        nome = request.form['nome']
+        descricao = request.form['descricao']
+        preco = request.form['preco']
+
+        sql = "UPDATE produtos SET nome = %s, descricao = %s, preco = %s WHERE id = %s"
+        cursor.execute(sql, (nome, descricao, preco, id))
+        conn.commit()
+
+        return redirect(url_for('listar_produtos'))
+
+    cursor.execute("SELECT * FROM produtos WHERE id = %s", (id,))
+    produto = cursor.fetchone()
+    return render_template('editar_produto.html', produto=produto)
+
+# Rota para excluir um produto
+@app.route('/excluir_produto/<int:id>', methods=['GET'])
+def excluir_produto(id):
+    cursor.execute("DELETE FROM produtos WHERE id = %s", (id,))
+    conn.commit()
+
+    return redirect(url_for('listar_produtos'))
 
 
 if __name__ == '__main__':

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Venda</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<style>
+    .sidenav {
+        height: 100%;
+        width: 200px;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #f8f9fa; /* Cor de fundo do menu */
+        padding-top: 20px;
+    }
+
+    .sidenav .nav-link {
+        padding: 10px 15px;
+        text-decoration: none;
+        font-size: 18px;
+        color: #333; /* Cor dos links */
+        display: block;
+    }
+
+    .sidenav .nav-link:hover {
+        background-color: #e9ecef; /* Cor de fundo ao passar o mouse */
+        color: #333; /* Cor do texto ao passar o mouse */
+    }
+</style>
+<body>
+    <div class="sidenav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/lista_clientes" class="nav-link">Cliente</a>
+        <a href="/lista_vendas" class="nav-link">Vendas</a>
+        <a href="/lista_produtos" class="nav-link">Produtos</a>  
+    </div>
+    <div class="container mt-5">
+        <h1>Cadastrar Venda</h1>
+            <form method="POST" action="{{ url_for('cadastrar_venda') }}">
+                <div class="form-group">
+                    <label for="produto_id">Produto:</label>
+                    <select class="form-control" id="produto_id" name="produto_id" required>
+                        {% for produto in produtos %}
+                            <option value="{{ produto.id }}">{{ produto.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cliente_id">Cliente:</label>
+                    <select class="form-control" id="cliente_id" name="cliente_id" required>
+                        {% for cliente in clientes %}
+                            <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            <div class="form-group">
+                <label for="produto_id">ID do Produto:</label>
+                <input type="text" class="form-control" id="produto_id" name="produto_id" placeholder="Digite o ID do produto" required>
+            </div>
+            <div class="form-group">
+                <label for="cliente_id">ID do Cliente:</label>
+                <input type="text" class="form-control" id="cliente_id" name="cliente_id" placeholder="Digite o ID do cliente" required>
+            </div>
+            <div class="form-group">
+                <label for="quantidade">Quantidade:</label>
+                <input type="text" class="form-control" id="quantidade" name="quantidade" placeholder="Digite a quantidade" required>
+            </div>
+            <div class="form-group">
+                <label for="total">Total:</label>
+                <input type="text" class="form-control" id="total" name="total" placeholder="Digite o total" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Vendas</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <style>
+        .sidenav {
+            height: 100%;
+            width: 200px;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #f8f9fa; /* Cor de fundo do menu */
+            padding-top: 20px;
+        }
+
+        .sidenav .nav-link {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #333; /* Cor dos links */
+            display: block;
+        }
+
+        .sidenav .nav-link:hover {
+            background-color: #e9ecef; /* Cor de fundo ao passar o mouse */
+            color: #333; /* Cor do texto ao passar o mouse */
+        }
+
+        .container {
+            margin-left: 220px; /* Para deixar espaço para o menu lateral */
+            margin-top: 50px; /* Espaçamento do topo */
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu lateral -->
+    <div class="sidenav">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/lista_clientes" class="nav-link">Cliente</a>
+        <a href="/lista_vendas" class="nav-link">Vendas</a>
+        <a href="/lista_produtos" class="nav-link active">Produtos</a>
+    </div>
+
+    <!-- Conteúdo da página -->
+    <div class="container">
+        <h2>Lista de Vendas</h2>
+        <!-- Tabela de produtos -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Preço</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produto in produtos %}
+                <tr>
+                    <td>{{ produto.id }}</td>
+                    <td>{{ produto.nome }}</td>
+                    <td>{{ produto.descricao }}</td>
+                    <td>{{ produto.preco }}</td>
+                    <td>
+                        <a href="{{ url_for('editar_produto', produto_id=produto.id) }}" class="btn btn-primary btn-sm">Editar</a>
+                        <a href="{{ url_for('excluir_produto', produto_id=produto.id) }}" class="btn btn-danger btn-sm">Excluir</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('cadastrar_venda') }}" class="btn btn-success">Cadastrar Novo Venda</a>
+    </div>
+
+    <!-- Bootstrap JS e dependências -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
