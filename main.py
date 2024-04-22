@@ -185,6 +185,56 @@ def excluir_produto(id):
 
     return redirect(url_for('listar_produtos'))
 
+# Rota para listagem de unidades
+@app.route('/lista_unidades')
+def lista_unidades():
+    cursor.execute("SELECT * FROM unidade")
+    rows = cursor.fetchall()
+    return render_template('lista_unidades.html', unidades=rows)
+
+
+# Rota para cadastrar uma Unidade
+@app.route('/cadastrar_unidade', methods=['GET', 'POST'])
+def cadastrar_unidade():
+    if request.method == 'POST':
+        nome = request.form['nome']
+        endereco = request.form['endereco']
+        telefone = request.form['telefone']
+
+        sql = "INSERT INTO unidade (nome, endereco, telefone) VALUES (%s, %s, %s)"
+        cursor.execute(sql, (nome, endereco, telefone))
+        conn.commit()
+
+        return redirect(url_for('listar_unidades'))
+    return render_template('cadastrar_unidade.html')
+
+
+# Rota para editar uma unidade
+@app.route('/editar_unidade/<int:unidade_id>', methods=['GET', 'POST'])
+def editar_unidade(unidade_id):
+    if request.method == 'POST':
+        nome = request.form['nome']
+        endereco = request.form['endereco']
+        telefone = request.form['telefone']
+
+        sql = "UPDATE unidade SET nome = %s, endereco = %s, telefone = %s WHERE id = %s"
+        cursor.execute(sql, (nome, endereco, telefone, unidade_id))
+        conn.commit()
+
+        return redirect(url_for('lista_unidades'))
+
+    cursor.execute("SELECT * FROM unidade WHERE id = %s", (unidade_id,))
+    unidade = cursor.fetchone()
+    return render_template('editar_unidade.html', unidade=unidade)
+
+# Rota para excluir uma unidade
+@app.route('/excluir_unidade/<int:unidade_id>', methods=['GET'])
+def excluir_unidade(unidade_id):
+    cursor.execute("DELETE FROM unidade WHERE id = %s", (unidade_id,))
+    conn.commit()
+
+    return redirect(url_for('lista_unidade'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
