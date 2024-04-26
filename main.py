@@ -1,80 +1,64 @@
 import mysql.connector
-from flask import Flask, render_template, request, redirect, url_for
+from clientes import cliente
+from unidades import unidade
+from produtos import produto
+from flask import *
 from tkinter import *
 
 app = Flask(__name__)
+app.secret_key = "super secret key"
 
-# Conectando ao banco de dados
-conn = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="root",
-    database="app_sust"
-)
-cursor = conn.cursor()
-# Página inicial - Lista de clientes
+# Rotas de cliente, referenciam o módulo clientes.
 @app.route('/lista_clientes')
-def listar_clientes():
-    cursor.execute("SELECT * FROM cliente")
-    rows = cursor.fetchall()
-    return render_template('lista_clientes.html', clientes=rows)
+def listar():
+    return cliente.listar_clientes()
+
+@app.route('/cadastrar_clientes', methods=['GET', 'POST'])
+def cadastrar_cliente():
+    return cliente.cadastrar_cliente()
+
+@app.route('/editar_clientes/<int:cliente_id>', methods=['GET', 'POST'])
+def editar_cliente(cliente_id):
+    return cliente.editar_cliente(cliente_id)
+
+@app.route('/excluir_clientes/<int:cliente_id>', methods=['GET'])
+def excluir_cliente(cliente_id):
+    return cliente.excluir_cliente(cliente_id)
+
+
+
+# Rotas de unidade, referenciam o módulo unidades.
+@app.route('/lista_unidades')
+def lista_unidades():
+    return unidade.listar_unidades()
+
+# Rota para cadastrar uma Unidade
+@app.route('/cadastrar_unidade', methods=['GET', 'POST'])
+def cadastrar_unidade():
+    return unidade.cadastrar_unidade()
+
+# Rota para editar uma unidade
+@app.route('/editar_unidade/<int:unidade_id>', methods=['GET', 'POST'])
+def editar_unidade(unidade_id):
+    return unidade.editar_unidade(unidade_id)
+
+# Rota para excluir uma unidade
+@app.route('/excluir_unidade/<int:unidade_id>', methods=['GET'])
+def excluir_unidade(unidade_id):
+    return unidade.excluir_unidade(unidade_id)
+
+
+
 
 @app.route('/')
 def home():
-    cursor.execute("SELECT * FROM cliente")
-    rows = cursor.fetchall()
-    return render_template('index.html', clientes=rows)
+    return render_template('index.html')
 
 @app.route('/dashboard')
 def dashboard():
-    
     return render_template('dashboard.html')
 
-# Página para cadastrar um novo cliente
-@app.route('/cadastrar', methods=['GET', 'POST'])
-def cadastrar_cliente():
-    if request.method == 'POST':
-        nome = request.form['nome']
-        email = request.form['email']
-        telefone = request.form['telefone']
 
-        sql = "INSERT INTO cliente (nome, email, telefone) VALUES (%s, %s, %s)"
-        cursor.execute(sql, (nome, email, telefone))
-        conn.commit()
-
-        return redirect(url_for('listar_clientes'))
-    return render_template('cadastrar_cliente.html')
-
-
-
-@app.route('/excluir/<int:cliente_id>', methods=['GET'])
-def excluir_cliente(cliente_id):
-    # Excluir o cliente do banco de dados
-    cursor.execute("DELETE FROM cliente WHERE id = %s", (cliente_id,))
-    conn.commit()
-
-    return redirect(url_for('lista_clientes'))
-
-@app.route('/editar/<int:cliente_id>', methods=['GET', 'POST'])
-def editar_cliente(cliente_id):
-    if request.method == 'POST':
-        # Obter os dados do formulário
-        nome = request.form['nome']
-        email = request.form['email']
-        telefone = request.form['telefone']
-
-        # Atualizar os dados do cliente no banco de dados
-        sql = "UPDATE cliente SET nome = %s, email = %s, telefone = %s WHERE id = %s"
-        cursor.execute(sql, (nome, email, telefone, cliente_id))
-        conn.commit()
-
-        return redirect(url_for('lista_clientes'))
-
-    # Se for uma requisição GET, exibir o formulário de edição
-    sql = "SELECT * FROM cliente WHERE id = %s"
-    cursor.execute(sql, (cliente_id,))
-    cliente = cursor.fetchone()
-    return render_template('editar_cliente.html', cliente=cliente)
 
 # Rota para cadastrar venda
 @app.route('/cadastrar_venda', methods=['GET', 'POST'])
@@ -139,51 +123,23 @@ def listar_vendas():
 
 # Página inicial - Lista de produtos
 @app.route('/lista_produtos')
-def listar_produtos():
-    cursor.execute("SELECT * FROM produtos")
-    rows = cursor.fetchall()
-    return render_template('lista_produtos.html', produtos=rows)
+def lista_produtos():
+    return produto.listar_produtos()
 
 # Rota para cadastrar um novo produto
 @app.route('/cadastrar_produto', methods=['GET', 'POST'])
 def cadastrar_produto():
-    if request.method == 'POST':
-        nome = request.form['nome']
-        descricao = request.form['descricao']
-        preco = request.form['preco']
-
-        sql = "INSERT INTO produtos (nome, descricao, preco) VALUES (%s, %s, %s)"
-        cursor.execute(sql, (nome, descricao, preco))
-        conn.commit()
-
-        return redirect(url_for('listar_produtos'))
-    return render_template('cadastrar_produto.html')
+    return produto.cadastrar_produto()
 
 # Rota para editar um produto
 @app.route('/editar_produto/<int:id>', methods=['GET', 'POST'])
 def editar_produto(id):
-    if request.method == 'POST':
-        nome = request.form['nome']
-        descricao = request.form['descricao']
-        preco = request.form['preco']
-
-        sql = "UPDATE produtos SET nome = %s, descricao = %s, preco = %s WHERE id = %s"
-        cursor.execute(sql, (nome, descricao, preco, id))
-        conn.commit()
-
-        return redirect(url_for('listar_produtos'))
-
-    cursor.execute("SELECT * FROM produtos WHERE id = %s", (id,))
-    produto = cursor.fetchone()
-    return render_template('editar_produto.html', produto=produto)
+    return produto.editar_produto(id)
 
 # Rota para excluir um produto
 @app.route('/excluir_produto/<int:id>', methods=['GET'])
 def excluir_produto(id):
-    cursor.execute("DELETE FROM produtos WHERE id = %s", (id,))
-    conn.commit()
-
-    return redirect(url_for('listar_produtos'))
+    return produto.excluir_produto(id)
 
 
 if __name__ == '__main__':

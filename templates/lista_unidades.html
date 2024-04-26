@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Lista de Clientes</title>
+    <title>Lista de Unidades</title>
     <!-- Adicione o CSS do Bootstrap -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -42,44 +42,34 @@
     </div>
     
     <div class="container">
-        <h1 class="mt-4">Lista de Clientes</h1>
+        <h1 class="mt-4">Lista de Unidades</h1>
         <table class="table table-striped mt-4">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
-                    <th>E-mail</th>
-                    <th>Telefone</th>
-                    <th>CEP</th>
                     <th>Endereço</th>
-                    <th>Gênero</th>
-                    <th>Estado Civil</th>
-                    <th>Idade</th>
-                    <th>Ações</th>
+                    <th>Telefone</th>
+                    <th>Imagem da Unidade</th>
                 </tr>
             </thead>
             <tbody>
-                {% for cliente in clientes %}
+                {% for unidade in unidades %}
                     <tr>
-                        <td>{{ cliente[0] }}</td>
-                        <td>{{ cliente[1] }}</td>
-                        <td>{{ cliente[2] }}</td>
-                        <td>{{ cliente[3] }}</td>
-                        <td>{{ cliente[4] }}</td>
-                        <td>{{ cliente[5] }}</td>
-                        <td>{{ cliente[6] }}</td>
-                        <td>{{ cliente[7] }}</td>
-                        <td>{{ cliente[8] }}</td>
+                        <td>{{ unidade[0] }}</td>
+                        <td>{{ unidade[1] }}</td>
+                        <td>{{ unidade[2] }}</td>
+                        <td>{{ unidade[3] }}</td>
                         <td>
-                            <a href="{{ url_for('editar_cliente', cliente_id=cliente[0]) }}" class="btn btn-sm btn-primary">Editar</a>
-                            <a href="{{ url_for('excluir_cliente', cliente_id=cliente[0]) }}" class="btn btn-sm btn-danger">Excluir</a>
+                            <a href="{{ url_for('editar_unidade', unidade_id=unidade[0]) }}" class="btn btn-sm btn-primary">Editar</a>
+                            <a href="{{ url_for('excluir_unidade', unidade_id=unidade[0]) }}" class="btn btn-sm btn-danger">Excluir</a>
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
         
-        <a href="{{ url_for('cadastrar_cliente') }}" class="btn btn-primary">Cadastrar Novo Cliente</a>
+        <a href="{{ url_for('cadastrar_unidade') }}" class="btn btn-primary">Cadastrar Nova Unidade</a>
     </div>
 
     <!-- Adicione o JS do Bootstrap (se necessário) -->

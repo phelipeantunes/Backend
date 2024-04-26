@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastrar Produto</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Editar Produto</title>
+    <!-- Adicione o CSS do Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <style>
     .sidenav {
@@ -41,31 +39,29 @@
         <a href="/lista_vendas" class="nav-link">Vendas</a>
         <a href="/lista_produtos" class="nav-link">Produtos</a>
     </div>
-    <div class="container mt-5">
-        <h1>Cadastrar Produto</h1>
-        <form action="/cadastrar_produto" method="POST">
+    <div class="container">
+        <h1 class="mt-4">Editar Produto</h1>
+        <form method="POST" action="{{ url_for('editar_produto', id=produto[0]) }}" class="mt-4">
             <div class="form-group">
                 <label for="nome">Nome do Produto:</label>
-                <input type="text" class="form-control" id="nome" name="nome" placeholder="Digite o nome do produto" required>
+                <input type="text" class="form-control" id="nome" name="nome" placeholder="Digite o nome do produto" value="{{ produto[1] }}" required>
             </div>
             <div class="form-group">
                 <label for="descricao">Descrição:</label>
-                <textarea class="form-control" id="descricao" name="descricao" placeholder="Digite a descrição do produto" required></textarea>
+                <textarea class="form-control" id="descricao" name="descricao" placeholder="Digite a descrição do produto" value="{{ produto[2] }}" required></textarea>
             </div>
             <div class="form-group">
                 <label for="preco">Preço:</label>
-                <input type="text" class="form-control" id="preco" name="preco" placeholder="Digite o preço do produto" required>
+                <input type="text" class="form-control" id="preco" name="preco" placeholder="Digite o preço do produto" value="{{ produto[3] }}" required>
             </div>
-            <div class="form-group">
-                <label for="unidade">Unidade:</label>
-                {% for unidade in unidades %}
-                    <select name="unidade" id="unidade">
-                        <option value="{{ unidade[0] }}">{{ unidade[1] }}</option>
-                    </select>
-                {% endfor %}
-            </div>
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
+
+            <button type="submit" class="btn btn-primary">Atualizar</button>
         </form>
     </div>
+
+    <!-- Adicione o JS do Bootstrap (se necessário) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
