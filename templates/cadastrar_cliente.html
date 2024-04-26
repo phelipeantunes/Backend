@@ -34,10 +34,10 @@
     <div class="sidenav">
         <a href="/" class="nav-link">Home</a>
         <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/lista_unidades" class="nav-link">Unidades</a>
         <a href="/lista_clientes" class="nav-link">Cliente</a>
         <a href="/lista_vendas" class="nav-link">Vendas</a>
-        <a href="/lista_produtos" class="nav-link">Produtos</a>  
-      
+        <a href="/lista_produtos" class="nav-link">Produtos</a>
     </div>
     <div class="container">
         <h1 class="mt-4">Cadastrar Cliente</h1>
@@ -55,6 +55,53 @@
             <div class="form-group">
                 <label for="telefone">Telefone:</label>
                 <input type="text" id="telefone" name="telefone" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="cep">CEP:</label>
+                <input type="text" id="cep" name="cep" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="endereco">Endereço:</label>
+                <input type="text" id="endereco" name="endereco" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="estado_civil">Estado Civil:</label>
+                <select name="estado_civil" id="estado_civil">
+                    <option value="Solteiro (a)">Solteiro (a)</option>
+                    <option value="Casado (a)">Casado (a)</option>
+                    <option value="Divorciado (a)">Divorciado (a)</option>
+                    <option value="Viúvo (a)">Viúvo (a)</option>
+                    <option value="Nao Informar">Não informar</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="genero">Gênero:</label>
+                <select name="genero" id="genero">
+                    <option value="Feminino">Feminino</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Nao Binario">Não Binário</option>
+                    <option value="Homem Trans">Homem Trans</option>
+                    <option value="Mulher Trans">Mulher Trans</option>
+                    <option value="Nao Informar">Não informar</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="idade">Idade:</label>
+                <input type="text" id="idade" name="idade" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="unidade">Unidade:</label>
+                {% for unidade in unidades %}
+                    <select name="unidade" id="unidade">
+                        <option value="{{ unidade[0] }}">{{ unidade[1] }}</option>
+                    </select>
+                {% endfor %}
             </div>
 
             <button type="submit" class="btn btn-primary">Cadastrar</button>

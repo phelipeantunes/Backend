@@ -35,9 +35,10 @@
     <div class="sidenav">
         <a href="/" class="nav-link">Home</a>
         <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/lista_unidades" class="nav-link">Unidades</a>
         <a href="/lista_clientes" class="nav-link">Cliente</a>
         <a href="/lista_vendas" class="nav-link">Vendas</a>
-        <a href="/lista_produtos" class="nav-link">Produtos</a>     
+        <a href="/lista_produtos" class="nav-link">Produtos</a>
     </div>
     
     <div class="container">
@@ -49,6 +50,11 @@
                     <th>Nome</th>
                     <th>E-mail</th>
                     <th>Telefone</th>
+                    <th>CEP</th>
+                    <th>Endereço</th>
+                    <th>Gênero</th>
+                    <th>Estado Civil</th>
+                    <th>Idade</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -59,6 +65,11 @@
                         <td>{{ cliente[1] }}</td>
                         <td>{{ cliente[2] }}</td>
                         <td>{{ cliente[3] }}</td>
+                        <td>{{ cliente[4] }}</td>
+                        <td>{{ cliente[5] }}</td>
+                        <td>{{ cliente[6] }}</td>
+                        <td>{{ cliente[7] }}</td>
+                        <td>{{ cliente[8] }}</td>
                         <td>
                             <a href="{{ url_for('editar_cliente', cliente_id=cliente[0]) }}" class="btn btn-sm btn-primary">Editar</a>
                             <a href="{{ url_for('excluir_cliente', cliente_id=cliente[0]) }}" class="btn btn-sm btn-danger">Excluir</a>
