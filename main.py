@@ -1,6 +1,7 @@
 import mysql.connector
 from clientes import cliente
 from unidades import unidade
+from produtos import produto
 from flask import *
 from tkinter import *
 
@@ -122,52 +123,23 @@ def listar_vendas():
 
 # Página inicial - Lista de produtos
 @app.route('/lista_produtos')
-def listar_produtos():
-    cursor.execute("SELECT * FROM produtos")
-    rows = cursor.fetchall()
-    return render_template('lista_produtos.html', produtos=rows)
+def lista_produtos():
+    return produto.listar_produtos()
 
 # Rota para cadastrar um novo produto
 @app.route('/cadastrar_produto', methods=['GET', 'POST'])
 def cadastrar_produto():
-    if request.method == 'POST':
-        nome = request.form['nome']
-        descricao = request.form['descricao']
-        preco = request.form['preco']
-
-        sql = "INSERT INTO produtos (nome, descricao, preco) VALUES (%s, %s, %s)"
-        cursor.execute(sql, (nome, descricao, preco))
-        conn.commit()
-
-        return redirect(url_for('listar_produtos'))
-    return render_template('cadastrar_produto.html')
+    return produto.cadastrar_produto()
 
 # Rota para editar um produto
 @app.route('/editar_produto/<int:id>', methods=['GET', 'POST'])
 def editar_produto(id):
-    if request.method == 'POST':
-        nome = request.form['nome']
-        descricao = request.form['descricao']
-        preco = request.form['preco']
-
-        sql = "UPDATE produtos SET nome = %s, descricao = %s, preco = %s WHERE id = %s"
-        cursor.execute(sql, (nome, descricao, preco, id))
-        conn.commit()
-
-        return redirect(url_for('listar_produtos'))
-
-    cursor.execute("SELECT * FROM produtos WHERE id = %s", (id,))
-    produto = cursor.fetchone()
-    return render_template('editar_produto.html', produto=produto)
+    return produto.editar_produto(id)
 
 # Rota para excluir um produto
 @app.route('/excluir_produto/<int:id>', methods=['GET'])
 def excluir_produto(id):
-    cursor.execute("DELETE FROM produtos WHERE id = %s", (id,))
-    conn.commit()
-
-    return redirect(url_for('listar_produtos'))
-
+    return produto.excluir_produto(id)
 
 
 if __name__ == '__main__':
