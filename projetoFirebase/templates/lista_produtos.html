@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Produtos</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            height: 100vh;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000; /* Garante que o botão flutuante esteja sobre outros elementos */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex">
+        <div class="sidebar">
+            <h2>Menu</h2>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('lista_produtos') }}">Produtos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('lista_clientes') }}">Clientes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('lista_unidades') }}">Unidades</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('lista_vendas') }}">Vendas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+            </ul>
+        </div>
+        <div class="content">
+            <div class="container">
+                <h1 class="mt-5">Lista de Produtos</h1>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Descrição</th>
+                            <th>Preço</th>
+                            <th>Categoria</th>
+                            <th>Unidade</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, produto in produtos.items() %}
+                        <tr>
+                            <td>{{ produto.nome }}</td>
+                            <td>{{ produto.descricao }}</td>
+                            <td>{{ produto.preco }}</td>
+                            <td>{{ produto.categoria }}</td>
+                            <td>{{ produto.unidadeProduto }}</td>
+                            <td>
+                                <!-- Botão para abrir o modal de edição -->
+                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEditar{{ key }}">Editar</button>
+                                <form action="{{ url_for('deletar_produto', id=key) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">Deletar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+   <!-- Botão flutuante -->
+   <button type="button" class="btn btn-primary btn-floating floating-button" data-toggle="modal" data-target="#modalCadastrarProduto">
+    <i class="fas fa-plus"></i>
+</button>
+<!-- Modal Cadastrar Produto -->
+<div class="modal fade" id="modalCadastrarProduto" tabindex="-1" role="dialog" aria-labelledby="modalCadastrarProdutoLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCadastrarProdutoLabel">Cadastrar Produto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('cadastrar_produto') }}" method="post">
+                    <div class="form-group">
+                        <label for="nome">Nome:</label>
+                        <input type="text" class="form-control" id="nome" name="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="descricao">Descrição:</label>
+                        <input type="text" class="form-control" id="descricao" name="descricao" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="preco">Preço:</label>
+                        <input type="number" class="form-control" id="preco" name="preco" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria">Categoria:</label>
+                        <input type="text" class="form-control" id="categoria" name="categoria" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unidadeProduto">Unidade:</label>
+                        <input type="text" class="form-control" id="unidadeProduto" name="unidadeProduto" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Modais de Edição -->
+    {% for key, produto in produtos.items() %}
+    <div class="modal fade" id="modalEditar{{ key }}" tabindex="-1" role="dialog" aria-labelledby="modalEditar{{ key }}Label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditar{{ key }}Label">Editar Produto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('editar_produto', id=key) }}" method="post">
+                        <div class="form-group">
+                            <label for="nome">Nome</label>
+                            <input type="text" name="nome" class="form-control" value="{{ produto.nome }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="descricao">Descrição</label>
+                            <input type="text" name="descricao" class="form-control" value="{{ produto.descricao }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="preco">Preço</label>
+                            <input type="number" name="preco" class="form-control" value="{{ produto.preco }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoria">Categoria</label>
+                            <input type="text" name="categoria" class="form-control" value="{{ produto.categoria }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="unidadeProduto">Unidade</label>
+                            <input type="text" name="unidadeProduto" class="form-control" value="{{ produto.unidadeProduto }}" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Atualizar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- jQuery deve vir antes do Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

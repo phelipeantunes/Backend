@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <title>Lista de Vendas</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Lista de Vendas</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, venda in vendas.items() %}
+                <tr>
+                    <td>{{ venda.cliente }}</td>
+                    <td>{{ venda.produto }}</td>
+                    <td>{{ venda.quantidade }}</td>
+                    <td>
+                        <a href="{{ url_for('editar_venda', id=key) }}" class="btn btn-warning">Editar</a>
+                        <a href="{{ url_for('deletar_venda', id=key) }}" class="btn btn-danger">Deletar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

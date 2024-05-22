@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Aplicação</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        /* Estilo para o menu lateral */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background-color: #007bff !important;
+            color: #fff;
+            padding-top: 70px;
+            transition: width 0.3s;
+            z-index: 1000; /* Ajuste para ficar sobreposto ao conteúdo */
+        }
+
+        .sidebar a {
+            padding: 10px 20px;
+            display: block;
+            color: #fff;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        /* Estilo para os ícones */
+        .fa {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu lateral -->
+    <div class="sidebar">
+        <h2 class="text-center"><i class="fas fa-bars"></i> Menu</h2>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Página Inicial</a>
+            </li>
+            <!-- Adicione mais itens de menu conforme necessário -->
+        </ul>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="content">
+        <!-- Aqui vai o conteúdo dinâmico de cada página -->
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Bootstrap JS e dependências -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Font Awesome JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+</body>
+</html>

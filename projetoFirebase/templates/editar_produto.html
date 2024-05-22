@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <title>Editar Produto</title>
+</head>
+<body>
+    <!-- Modal Editar Produto -->
+    <div class="modal fade" id="modalEditarProduto" tabindex="-1" role="dialog" aria-labelledby="modalEditarProdutoLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarProdutoLabel">Editar Produto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="" method="post">
+                        <div class="form-group">
+                            <label for="nome">Nome</label>
+                            <input type="text" name="nome" class="form-control" value="{{ produto['nome'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="descricao">Descrição</label>
+                            <input type="text" name="descricao" class="form-control" value="{{ produto['descricao'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="preco">Preço</label>
+                            <input type="number" name="preco" class="form-control" value="{{ produto['preco'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoria">Categoria</label>
+                            <select name="categoria" class="form-control" required>
+                                <option value="categoria1">Categoria 1</option>
+                                <option value="categoria2">Categoria 2</option>
+                                <!-- Adicione mais opções conforme necessário -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="unidadeProduto">Unidade</label>
+                            <input type="text" name="unidadeProduto" class="form-control" value="{{ produto['unidadeProduto'] }}" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Atualizar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery deve vir antes do Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

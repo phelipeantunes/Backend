@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>CRUD Firebase</title>
+    <style>
+        /* Estilo para o menu lateral */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background-color: #007bff !important;
+            color: #fff;
+            padding-top: 70px;
+            transition: width 0.3s;
+            z-index: 1000; /* Ajuste para ficar sobreposto ao conteúdo */
+        }
+
+        .sidebar a {
+            padding: 10px 20px;
+            display: block;
+            color: #fff;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        /* Estilo para os ícones */
+        .fa {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Menu lateral -->
+            <div class="col-md-2 bg-light">
+                 <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cadastrar_produto">Cadastrar Produto</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cadastrar_cliente">Cadastrar Cliente</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cadastrar_unidade">Cadastrar Unidade</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cadastrar_venda">Cadastrar Venda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/lista_clientes">Lista de Clientes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/lista_produtos">Lista de Produtos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/lista_unidades">Lista de Unidades</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/lista_vendas">Lista de Vendas</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Conteúdo principal -->
+            <div class="col-md-10">
+                <h1 class="mt-5">Projeto Sustentabilidade Microlins</h1>
+                <a href="/logout" class="btn btn-danger">Sair</a>
+
+                <!-- Tabela de Usuários -->
+                <h2 class="mt-5">Lista de Usuários</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, usuario in usuarios.items() %}
+                            <tr>
+                                <td>{{ usuario.name }}</td>
+                                <td>{{ usuario.email }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- Conteúdo da página -->
+    <div class="container-fluid">
+        <h1 class="mt-4">Produtos</h1>
+        <button type="button" class="btn btn-success mb-4" data-toggle="modal" data-target="#modalNovoProduto">
+            Adicionar Produto
+        </button>
+
+<!-- Tabela de produtos -->
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>#</th>
+                <th>Nome</th>
+                <th>Preço</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if produtos %}
+                {% for key, produto in produtos.items() %}
+                    <tr>
+                        <td>{{ key }}</td> <!-- Utilize a chave do produto como número -->
+                        <td>{{ produto.nome }}</td> <!-- Acesse diretamente o nome do produto -->
+                        <td>{{ produto.preco }}</td> <!-- Acesse diretamente o preço do produto -->
+                        <td>
+                            <a href="/editar_produto/{{ key }}" class="btn btn-primary btn-sm mr-2">
+                                Editar
+                            </a>
+                            <form action="/deletar_produto/{{ key }}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    Deletar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4">Nenhum produto cadastrado ainda.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+    </div>
+
+    <!-- Modal Novo Produto -->
+    <div class="modal fade" id="modalNovoProduto" tabindex="-1" role="dialog" aria-labelledby="modalNovoProdutoLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalNovoProdutoLabel">Novo Produto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Formulário para adicionar novo produto -->
+                    <form action="/cadastrar_produto" method="post">
+                        <div class="form-group">
+                            <label for="nomeProduto">Nome</label>
+                            <input type="text" class="form-control" id="nomeProduto" name="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="descricaoProduto">Descrição</label>
+                            <textarea class="form-control" id="descricaoProduto" name="descricao" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="precoProduto">Preço</label>
+                            <input type="number" class="form-control" id="precoProduto" name="preco" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoriaProduto">Categoria</label>
+                            <input type="text" class="form-control" id="categoriaProduto" name="categoria">
+                        </div>
+                        <div class="form-group">
+                            <label for="unidadeProduto">Unidade</label>
+                            <input type="text" class="form-control" id="unidadeProduto" name="unidadeProduto">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
