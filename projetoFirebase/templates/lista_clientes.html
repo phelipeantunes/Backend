@@ -95,6 +95,12 @@
                     <tr>
                         <th>Nome</th>
                         <th>Email</th>
+                        <th>Telefone </th>
+                        <th>Endereço </th>
+                        <th>Gênero</th>
+                        <th>Estado Civil</th>
+                        <th>Idade</th>
+                        <!-- <th>Unidade Cliente ID</th> -->
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -103,6 +109,12 @@
                     <tr>
                         <td>{{ cliente.nome }}</td>
                         <td>{{ cliente.email }}</td>
+                        <td>{{ cliente.telefone }}</td>
+                        <td>{{ cliente.endereco }}</td>
+                        <td>{% if cliente.genero %} Masculino {% else %} Feminino {% endif %}</td>
+                        <td>{{ cliente.estadoCivil }}</td>
+                        <td>{{ cliente.idade }}</td>
+                        <!-- <td>{{ cliente.telefone }}</td> -->
                         <td>
                             <!-- Botão para abrir o modal de edição -->
                             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
@@ -120,7 +132,8 @@
     </div>
     </div>
     <!-- Botão flutuante -->
-    <button type="button" class="btn btn-primary btn-floating floating-button" data-toggle="modal" data-target="#modalCadastrarCliente">
+    <button type="button" class="btn btn-primary btn-floating floating-button" data-toggle="modal"
+        data-target="#modalCadastrarCliente">
         <i class="fas fa-plus"></i>
     </button>
 
@@ -145,6 +158,35 @@
                             <label for="email">Email:</label>
                             <input type="email" class="form-control" id="email" name="email" required>
                         </div>
+                        <div class="form-group">
+                            <label for="telefone">Telefone:</label>
+                            <input type="telefone" class="form-control" id="telefone" name="telefone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endereco">Endereço:</label>
+                            <input type="endereco" class="form-control" id="endereco" name="endereco" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="genero">Gênero:</label>
+                            <select class="form-control" id="genero" name="genero" required>
+                                <option value="true">Masculino</option>
+                                <option value="false">Feminino</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="estadoCivil">Estado Civil:</label>
+                            <select class="form-control" id="estadoCivil" name="estadoCivil" required>
+                                <option value="Solteiro">Solteiro(a)</option>
+                                <option value="Casado">Casado(a)</option>
+                                <option value="Separado">Separado(a)</option>
+                                <option value="Divorciado">Divorciado(a)</option>
+                                <option value="Viúvo">Viúvo(a)</option>
+                            </select>
+                        </div>                        
+                        <div class="form-group">
+                            <label for="idade">Idade:</label>
+                            <input type="idade" class="form-control" id="idade" name="idade" required>
+                        </div>
                         <button type="submit" class="btn btn-primary">Cadastrar</button>
                     </form>
                 </div>
@@ -168,11 +210,41 @@
                     <form action="{{ url_for('editar_cliente', id=key) }}" method="post">
                         <div class="form-group">
                             <label for="nome">Nome</label>
-                            <input type="text" name="nome" class="form-control" value="{{ cliente.nome }}" required>
+                            <input type="text" name="nome" class="form-control" value="{{ cliente['nome'] }}" required>
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" name="email" class="form-control" value="{{ cliente.email }}" required>
+                            <input type="email" name="email" class="form-control" value="{{ cliente['email'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="telefone">Telefone:</label>
+                            <input type="text" class="form-control" name="telefone" value="{{ cliente['telefone'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endereco">Endereço:</label>
+                            <input type="text" class="form-control" id="endereco" name="endereco" value="{{ cliente['endereco'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="genero">Gênero:</label>
+                            <select class="form-control" id="genero" name="genero" required>
+                                <option value="true" {% if cliente['genero'] %} selected {% endif %}>Masculino</option>
+                                <option value="false" {% if not cliente['genero'] %} selected {% endif %}>Feminino</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="estadoCivil">Estado Civil:</label>
+                            <select class="form-control" id="estadoCivil" name="estadoCivil" required>
+                                <option value="Solteiro">Solteiro(a)</option>
+                                <option value="Casado">Casado(a)</option>
+                                <option value="Separado">Separado(a)</option>
+                                <option value="Divorciado">Divorciado(a)</option>
+                                <option value="Viúvo">Viúvo(a)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="idade">Idade:</label>
+                            <input type="number" class="form-control" id="idade" name="idade" value="{{ cliente['idade'] }}" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Atualizar</button>
                     </form>

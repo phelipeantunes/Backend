@@ -150,30 +150,60 @@ def lista_clientes():
 def cadastrar_cliente():
     nome = request.form['nome']
     email = request.form['email']
+    telefone = request.form['telefone']
+    endereco = request.form['endereco']
+    genero_str = request.form['genero']  # Obtém o valor do dropdown como string
+    genero_bool = genero_str == 'true'   # Converte para booleano
+    estadoCivil = request.form['estadoCivil']
+    idade = request.form['idade']
     
     cliente = {
         'nome': nome,
-        'email': email
+        'email': email,
+        'telefone': telefone,
+        'endereco': endereco,
+        'genero': genero_bool,  # Armazena o booleano no banco de dados
+        'estadoCivil': estadoCivil,
+        'idade': idade 
     }
     
     db.child("clientes").push(cliente)
     return redirect(url_for('lista_clientes'))
 
-# Rota para editar cliente
+
 @app.route('/editar_cliente/<id>', methods=['GET', 'POST'])
 def editar_cliente(id):
     if request.method == 'POST':
         nome = request.form['nome']
         email = request.form['email']
+        telefone = request.form['telefone']
+        endereco = request.form['endereco']
+        genero_str = request.form['genero']  # Obtém o valor do dropdown como string
+        genero_bool = genero_str == 'true'   # Converte para booleano
+        estadoCivil = request.form['estadoCivil']
+        idade = request.form['idade']
         
         db.child("clientes").child(id).update({
             "nome": nome,
-            "email": email
+            "email": email,
+            "telefone": telefone,
+            "endereco": endereco,
+            "genero": genero_bool,  # Armazena o booleano no banco de dados
+            "estadoCivil": estadoCivil, 
+            "idade": idade 
         })
+        
         return redirect(url_for('lista_clientes'))
     else:
         cliente = db.child("clientes").child(id).get().val()
-        return render_template('editar_cliente.html', cliente=cliente)
+        # Verifica se o cliente existe antes de tentar acessar seus dados
+        if cliente:
+            return render_template('editar_cliente.html', cliente=cliente)
+        else:
+            flash('Cliente não encontrado.', 'error')
+            return redirect(url_for('lista_clientes'))
+
+
 
 # Rota para deletar cliente
 @app.route('/deletar_cliente/<id>', methods=['POST'])
