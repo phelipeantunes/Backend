@@ -1,37 +1,166 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <title>Lista de Vendas</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Estilo para o menu lateral */
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            background-color: #007bff !important;
+            color: #fff;
+            padding-top: 70px;
+        }
+
+        .sidebar a {
+            padding: 10px 20px;
+            display: block;
+            color: #fff;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        /* Estilo para os ícones */
+        .fa {
+            color: #fff;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1 class="mt-5">Lista de Vendas</h1>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Cliente</th>
-                    <th>Produto</th>
-                    <th>Quantidade</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for key, venda in vendas.items() %}
-                <tr>
-                    <td>{{ venda.cliente }}</td>
-                    <td>{{ venda.produto }}</td>
-                    <td>{{ venda.quantidade }}</td>
-                    <td>
-                        <a href="{{ url_for('editar_venda', id=key) }}" class="btn btn-warning">Editar</a>
-                        <a href="{{ url_for('deletar_venda', id=key) }}" class="btn btn-danger">Deletar</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="d-flex">
+        <div class="sidebar">
+            <h2>Menu</h2>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('lista_produtos') }}">Produtos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('lista_clientes') }}">Clientes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('lista_unidades') }}">Unidades</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('lista_vendas') }}">Vendas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+            </ul>
+        </div>
+        <div class="content">
+            <div class="header">
+                <h1 class="mt-5">Lista de Vendas</h1>
+                <a href="/logout" class="btn btn-danger">Sair</a>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Cliente</th>
+                        <th>Quantidade</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if vendas %}
+                    {% for key, venda in vendas.items() %}
+                    <tr>
+                        <td>{{ venda.produto }}</td>
+                        <td>{{ venda.cliente }}</td>
+                        <td>{{ venda.quantidade }}</td>
+                        <td>{{ venda.data }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5">Nenhuma venda encontrada.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+
+            </table>
+        </div>
     </div>
+
+    <!-- Botão flutuante -->
+    <button type="button" class="btn btn-primary btn-floating floating-button" data-toggle="modal"
+        data-target="#modalCadastrarVenda">
+        <i class="fas fa-plus"></i>
+    </button>
+
+<!-- Modal Cadastrar Venda -->
+<div class="modal fade" id="modalCadastrarVenda" tabindex="-1" role="dialog"
+    aria-labelledby="modalCadastrarVendaLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCadastrarVendaLabel">Cadastrar Venda</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('cadastrar_venda') }}" method="post">
+                    <div class="form-group">
+                        <label for="cliente">Cliente:</label>
+                        <input type="text" class="form-control" id="cliente" name="cliente" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="produto">Produto:</label>
+                        <input type="text" class="form-control" id="produto" name="produto" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantidade">Quantidade:</label>
+                        <input type="number" class="form-control" id="quantidade" name="quantidade" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="data">Data:</label>
+                        <input type="date" class="form-control" id="data" name="data" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- jQuery deve vir antes do Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

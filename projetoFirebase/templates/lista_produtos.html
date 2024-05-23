@@ -10,23 +10,50 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
+                 /* Estilo para o menu lateral */
         .sidebar {
             height: 100vh;
-            background-color: #f8f9fa;
-            padding: 20px;
+            width: 250px;
+            background-color: #007bff !important;
+            color: #fff;
+            padding-top: 70px;
+        }
+
+        .sidebar a {
+            padding: 10px 20px;
+            display: block;
+            color: #fff;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
         }
 
         .content {
             margin-left: 250px;
             padding: 20px;
+            flex-grow: 1;
+        }
+
+        /* Estilo para os ícones */
+        .fa {
+            color: #fff;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         .floating-button {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            z-index: 1000; /* Garante que o botão flutuante esteja sobre outros elementos */
+            z-index: 1000;
         }
+    </style>
     </style>
 </head>
 
@@ -135,46 +162,45 @@
 </div>
 
     <!-- Modais de Edição -->
-    {% for key, produto in produtos.items() %}
-    <div class="modal fade" id="modalEditar{{ key }}" tabindex="-1" role="dialog" aria-labelledby="modalEditar{{ key }}Label" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalEditar{{ key }}Label">Editar Produto</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="{{ url_for('editar_produto', id=key) }}" method="post">
-                        <div class="form-group">
-                            <label for="nome">Nome</label>
-                            <input type="text" name="nome" class="form-control" value="{{ produto.nome }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="descricao">Descrição</label>
-                            <input type="text" name="descricao" class="form-control" value="{{ produto.descricao }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="preco">Preço</label>
-                            <input type="number" name="preco" class="form-control" value="{{ produto.preco }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="categoria">Categoria</label>
-                            <input type="text" name="categoria" class="form-control" value="{{ produto.categoria }}" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="unidadeProduto">Unidade</label>
-                            <input type="text" name="unidadeProduto" class="form-control" value="{{ produto.unidadeProduto }}" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Atualizar</button>
-                    </form>
-                </div>
+{% for key, produto in produtos.items() %}
+<div class="modal fade" id="modalEditar{{ key }}" tabindex="-1" role="dialog" aria-labelledby="modalEditar{{ key }}Label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEditar{{ key }}Label">Editar Produto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('editar_produto', id=key) }}" method="post">
+                    <div class="form-group">
+                        <label for="nome">Nome</label>
+                        <input type="text" name="nome" class="form-control" value="{{ produto.nome }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="descricao">Descrição</label>
+                        <input type="text" name="descricao" class="form-control" value="{{ produto.descricao }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="preco">Preço</label>
+                        <input type="number" name="preco" class="form-control" value="{{ produto.preco }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria">Categoria</label>
+                        <input type="text" name="categoria" class="form-control" value="{{ produto.categoria }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unidadeProduto">Unidade</label>
+                        <input type="text" name="unidadeProduto" class="form-control" value="{{ produto.unidadeProduto }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Atualizar</button>
+                </form>
             </div>
         </div>
     </div>
-    {% endfor %}
+</div>
+{% endfor %}
 
     <!-- jQuery deve vir antes do Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

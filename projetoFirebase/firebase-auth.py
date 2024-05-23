@@ -97,8 +97,92 @@ def cadastrar_produto():
     else:
         return render_template('cadastrar_produto.html')
 
-# Rota de cadastro de unidade
-@app.route('/cadastrar_unidade', methods=['GET', 'POST'])
+
+# Rota de edição de produto
+@app.route('/editar_produto/<id>', methods=['GET', 'POST'])
+def editar_produto(id):
+    if request.method == 'POST':
+        nome = request.form['nome']
+        descricao = request.form['descricao']
+        preco = request.form['preco']
+        categoria = request.form['categoria']
+        unidadeProduto = request.form['unidadeProduto']
+        
+        db.child("produtos").child(id).update({
+            "nome": nome,
+            "descricao": descricao,
+            "preco": preco,
+            "categoria": categoria,
+            "unidadeProduto": unidadeProduto
+        })
+        return redirect(url_for('lista_produtos'))
+    else:
+        produto = db.child("produtos").child(id).get().val()
+        return render_template('editar_produto.html', produto=produto)
+
+
+
+# Rota de listagem de produtos
+@app.route('/lista_produtos')
+def lista_produtos():
+    produtos = db.child("produtos").get().val()
+    return render_template('lista_produtos.html', produtos=produtos)
+
+
+
+
+
+# Rota de deleção de produto
+@app.route('/deletar_produto/<id>', methods=['POST'])
+def deletar_produto(id):
+    db.child("produtos").child(id).remove()
+    return redirect(url_for('lista_produtos'))
+
+@app.route('/lista_clientes')
+def lista_clientes():
+    clientes = db.child("clientes").get().val()
+    if clientes is None:
+        clientes = {}
+    return render_template('lista_clientes.html', clientes=clientes)
+
+# Rota para cadastrar cliente
+@app.route('/cadastrar_cliente', methods=['POST'])
+def cadastrar_cliente():
+    nome = request.form['nome']
+    email = request.form['email']
+    
+    cliente = {
+        'nome': nome,
+        'email': email
+    }
+    
+    db.child("clientes").push(cliente)
+    return redirect(url_for('lista_clientes'))
+
+# Rota para editar cliente
+@app.route('/editar_cliente/<id>', methods=['GET', 'POST'])
+def editar_cliente(id):
+    if request.method == 'POST':
+        nome = request.form['nome']
+        email = request.form['email']
+        
+        db.child("clientes").child(id).update({
+            "nome": nome,
+            "email": email
+        })
+        return redirect(url_for('lista_clientes'))
+    else:
+        cliente = db.child("clientes").child(id).get().val()
+        return render_template('editar_cliente.html', cliente=cliente)
+
+# Rota para deletar cliente
+@app.route('/deletar_cliente/<id>', methods=['POST'])
+def deletar_cliente(id):
+    db.child("clientes").child(id).remove()
+    return redirect(url_for('lista_clientes'))
+
+# Rota para cadastrar uma nova unidade
+@app.route('/cadastrar_unidade', methods=['POST'])
 def cadastrar_unidade():
     if request.method == 'POST':
         nome = request.form['nome']
@@ -107,44 +191,7 @@ def cadastrar_unidade():
         db.child("unidades").push(unidade)
         return redirect(url_for('lista_unidades'))
     else:
-        return render_template('cadastrar_unidade.html')
-
-# Rota de cadastro de venda
-@app.route('/cadastrar_venda', methods=['GET', 'POST'])
-def cadastrar_venda():
-    if request.method == 'POST':
-        cliente = request.form['cliente']
-        produto = request.form['produto']
-        quantidade = request.form['quantidade']
-        venda = {"cliente": cliente, "produto": produto, "quantidade": quantidade}
-        db.child("vendas").push(venda)
-        return redirect(url_for('lista_vendas'))
-    else:
-        return render_template('cadastrar_venda.html')
-
-# Rota de edição de cliente
-@app.route('/editar_cliente/<id>', methods=['GET', 'POST'])
-def editar_cliente(id):
-    if request.method == 'POST':
-        nome = request.form['nome']
-        email = request.form['email']
-        db.child("clientes").child(id).update({"nome": nome, "email": email})
-        return redirect(url_for('lista_clientes'))
-    else:
-        cliente = db.child("clientes").child(id).get().val()
-        return render_template('editar_cliente.html', cliente=cliente)
-
-# Rota de edição de produto
-@app.route('/editar_produto/<id>', methods=['GET', 'POST'])
-def editar_produto(id):
-    if request.method == 'POST':
-        nome = request.form['nome']
-        preco = request.form['preco']
-        db.child("produtos").child(id).update({"nome": nome, "preco": preco})
-        return redirect(url_for('lista_produtos'))
-    else:
-        produto = db.child("produtos").child(id).get().val()
-        return render_template('editar_produto.html', produto=produto)
+        return render_template('lista_unidades.html', unidades=unidades)
 
 # Rota de edição de unidade
 @app.route('/editar_unidade/<id>', methods=['GET', 'POST'])
@@ -158,42 +205,13 @@ def editar_unidade(id):
         unidade = db.child("unidades").child(id).get().val()
         return render_template('editar_unidade.html', unidade=unidade)
 
-# Rota de listagem de clientes
-@app.route('/lista_clientes')
-def lista_clientes():
-    clientes = db.child("clientes").get().val()
-    return render_template('lista_clientes.html', clientes=clientes)
-
-# Rota de listagem de produtos
-@app.route('/lista_produtos')
-def lista_produtos():
-    produtos = db.child("produtos").get().val()
-    return render_template('lista_produtos.html', produtos=produtos)
-
-
 # Rota de listagem de unidades
 @app.route('/lista_unidades')
 def lista_unidades():
     unidades = db.child("unidades").get().val()
+    if unidades is None:
+        unidades = {}
     return render_template('lista_unidades.html', unidades=unidades)
-
-# Rota de listagem de vendas
-@app.route('/lista_vendas')
-def lista_vendas():
-    vendas = db.child("vendas").get().val()
-    return render_template('lista_vendas.html', vendas=vendas)
-
-# Rota de deleção de cliente
-@app.route('/deletar_cliente/<id>', methods=['POST'])
-def deletar_cliente(id):
-    db.child("clientes").child(id).remove()
-    return redirect(url_for('lista_clientes'))
-
-# Rota de deleção de produto
-@app.route('/deletar_produto/<id>', methods=['POST'])
-def deletar_produto(id):
-    db.child("produtos").child(id).remove()
-    return redirect(url_for('lista_produtos'))
 
 # Rota de deleção de unidade
 @app.route('/deletar_unidade/<id>', methods=['POST'])
@@ -201,11 +219,52 @@ def deletar_unidade(id):
     db.child("unidades").child(id).remove()
     return redirect(url_for('lista_unidades'))
 
+
+# Rota de listagem de vendas
+@app.route('/lista_vendas')
+def lista_vendas():
+    vendas = db.child("vendas").get().val()
+    if vendas is None:
+        vendas = {}  # Se não houver vendas, inicializa como um dicionário vazio
+    return render_template('lista_vendas.html', vendas=vendas)
+
+# Rota de cadastro de venda
+@app.route('/cadastrar_venda', methods=['GET', 'POST'])
+def cadastrar_venda():
+    if request.method == 'POST':
+        cliente = request.form['cliente']
+        produto = request.form['produto']
+        quantidade = request.form['quantidade']
+        data = request.form['data']  # Adicione isso se houver um campo de data no formulário
+
+        venda = {"cliente": cliente, "produto": produto, "quantidade": quantidade, "data": data}  # Adicione "data" ao dicionário
+        db.child("vendas").push(venda)
+        return redirect(url_for('lista_vendas'))
+    else:
+        return render_template('cadastrar_venda.html')
+
+# Rota de edição de venda
+@app.route('/editar_venda/<id>', methods=['GET', 'POST'])
+def editar_venda(id):
+    if request.method == 'POST':
+        cliente = request.form['cliente']
+        produto = request.form['produto']
+        quantidade = request.form['quantidade']
+        data = request.form['data']
+
+        venda = {"cliente": cliente, "produto": produto, "quantidade": quantidade, "data": data}
+        db.child("vendas").child(id).update(venda)
+        return redirect(url_for('lista_vendas'))
+    else:
+        venda = db.child("vendas").child(id).get().val()
+        return render_template('editar_venda.html', venda=venda)
+
 # Rota de deleção de venda
 @app.route('/deletar_venda/<id>', methods=['POST'])
 def deletar_venda(id):
     db.child("vendas").child(id).remove()
     return redirect(url_for('lista_vendas'))
+
 
 if __name__ == '__main__':
     app.secret_key = 'your_secret_key_here'

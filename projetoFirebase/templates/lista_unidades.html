@@ -1,35 +1,177 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <title>Lista de Unidades</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Estilo para o menu lateral */
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            background-color: #007bff !important;
+            color: #fff;
+            padding-top: 70px;
+        }
+
+        .sidebar a {
+            padding: 10px 20px;
+            display: block;
+            color: #fff;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        /* Estilo para os ícones */
+        .fa {
+            color: #fff;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1 class="mt-5">Lista de Unidades</h1>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Localização</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for key, unidade in unidades.items() %}
-                <tr>
-                    <td>{{ unidade.nome }}</td>
-                    <td>{{ unidade.localizacao }}</td>
-                    <td>
-                        <a href="{{ url_for('editar_unidade', id=key) }}" class="btn btn-warning">Editar</a>
-                        <a href="{{ url_for('deletar_unidade', id=key) }}" class="btn btn-danger">Deletar</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <div class="d-flex">
+        <div class="sidebar">
+            <h2>Menu</h2>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('lista_produtos') }}">Produtos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('lista_clientes') }}">Clientes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('lista_unidades') }}">Unidades</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('lista_vendas') }}">Vendas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+            </ul>
+        </div>
+        <div class="content">
+            <div class="header">
+                <h1 class="mt-5">Lista de Unidades</h1>
+                <a href="/logout" class="btn btn-danger">Sair</a>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Localização</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, unidade in unidades.items() %}
+                    <tr>
+                        <td>{{ unidade.nome }}</td>
+                        <td>{{ unidade.localizacao }}</td>
+                        <td>
+                            <!-- Botão para abrir o modal de edição -->
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEditar{{ key }}">Editar</button>
+                            <form action="{{ url_for('deletar_unidade', id=key) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">Deletar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Botão flutuante -->
+            <button type="button" class="btn btn-primary btn-floating floating-button" data-toggle="modal" data-target="#modalCadastrarUnidade">
+                <i class="fas fa-plus"></i>
+            </button>
+            <div class="modal fade" id="modalCadastrarUnidade" tabindex="-1" role="dialog" aria-labelledby="modalCadastrarUnidadeLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalCadastrarUnidadeLabel">Cadastrar Unidade</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{{ url_for('cadastrar_unidade') }}" method="post">
+                                <div class="form-group">
+                                    <label for="nome">Nome:</label>
+                                    <input type="text" class="form-control" id="nome" name="nome" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="localizacao">Localização:</label>
+                                    <input type="text" class="form-control" id="localizacao" name="localizacao" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Cadastrar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modais de Edição -->
+            {% for key, unidade in unidades.items() %}
+            <div class="modal fade" id="modalEditar{{ key }}" tabindex="-1" role="dialog" aria-labelledby="modalEditar{{ key }}Label" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalEditar{{ key }}Label">Editar Unidade</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{{ url_for('editar_unidade', id=key) }}" method="post">
+                                <div class="form-group">
+                                    <label for="nome">Nome</label>
+                                    <input type="text" name="nome" class="form-control" value="{{ unidade.nome }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="localizacao">Localização</label>
+                                    <input type="text" name="localizacao" class="form-control" value="{{ unidade.localizacao }}" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Atualizar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- jQuery deve vir antes do Bootstrap JS -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
