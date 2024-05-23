@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import pyrebase
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='assests')
 
 # Configuração do Firebase
 firebaseConfig = {
@@ -217,6 +217,7 @@ def cadastrar_unidade():
     if request.method == 'POST':
         nome = request.form['nome']
         localizacao = request.form['localizacao']
+        telefone = request.form['telefone']
         unidade = {"nome": nome, "localizacao": localizacao}
         db.child("unidades").push(unidade)
         return redirect(url_for('lista_unidades'))
@@ -229,7 +230,11 @@ def editar_unidade(id):
     if request.method == 'POST':
         nome = request.form['nome']
         localizacao = request.form['localizacao']
-        db.child("unidades").child(id).update({"nome": nome, "localizacao": localizacao})
+        telefone = request.form['telefone']
+        db.child("unidades").child(id).update({
+            "nome": nome, 
+            "localizacao": localizacao,
+            "telefone": telefone})
         return redirect(url_for('lista_unidades'))
     else:
         unidade = db.child("unidades").child(id).get().val()
@@ -265,9 +270,14 @@ def cadastrar_venda():
         cliente = request.form['cliente']
         produto = request.form['produto']
         quantidade = request.form['quantidade']
+        totpedido = request.form['totpedido']
         data = request.form['data']  # Adicione isso se houver um campo de data no formulário
 
-        venda = {"cliente": cliente, "produto": produto, "quantidade": quantidade, "data": data}  # Adicione "data" ao dicionário
+        venda = {"cliente": cliente,
+                  "produto": produto,
+                   "quantidade": quantidade, 
+                   "data": data,
+                   "totpedido":totpedido} 
         db.child("vendas").push(venda)
         return redirect(url_for('lista_vendas'))
     else:
@@ -280,9 +290,14 @@ def editar_venda(id):
         cliente = request.form['cliente']
         produto = request.form['produto']
         quantidade = request.form['quantidade']
+        totpedido = request.form['totpedido']
         data = request.form['data']
 
-        venda = {"cliente": cliente, "produto": produto, "quantidade": quantidade, "data": data}
+        venda = {"cliente": cliente, 
+                 "produto": produto, 
+                 "quantidade": quantidade, 
+                 "data": data,
+                 "totpedido":totpedido}
         db.child("vendas").child(id).update(venda)
         return redirect(url_for('lista_vendas'))
     else:

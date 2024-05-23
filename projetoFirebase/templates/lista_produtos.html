@@ -10,7 +10,7 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
-                 /* Estilo para o menu lateral */
+        /* Estilo para o menu lateral */
         .sidebar {
             height: 100vh;
             width: 250px;
@@ -53,7 +53,6 @@
             right: 20px;
             z-index: 1000;
         }
-    </style>
     </style>
 </head>
 
@@ -107,9 +106,7 @@
                             <td>
                                 <!-- Botão para abrir o modal de edição -->
                                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEditar{{ key }}">Editar</button>
-                                <form action="{{ url_for('deletar_produto', id=key) }}" method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-danger btn-sm">Deletar</button>
-                                </form>
+                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalDeletar" data-id="{{ key }}">Deletar</button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -118,93 +115,128 @@
             </div>
         </div>
     </div>
-   <!-- Botão flutuante -->
-   <button type="button" class="btn btn-primary btn-floating floating-button" data-toggle="modal" data-target="#modalCadastrarProduto">
-    <i class="fas fa-plus"></i>
-</button>
-<!-- Modal Cadastrar Produto -->
-<div class="modal fade" id="modalCadastrarProduto" tabindex="-1" role="dialog" aria-labelledby="modalCadastrarProdutoLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalCadastrarProdutoLabel">Cadastrar Produto</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form action="{{ url_for('cadastrar_produto') }}" method="post">
-                    <div class="form-group">
-                        <label for="nome">Nome:</label>
-                        <input type="text" class="form-control" id="nome" name="nome" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="descricao">Descrição:</label>
-                        <input type="text" class="form-control" id="descricao" name="descricao" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="preco">Preço:</label>
-                        <input type="number" class="form-control" id="preco" name="preco" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="categoria">Categoria:</label>
-                        <input type="text" class="form-control" id="categoria" name="categoria" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="unidadeProduto">Unidade:</label>
-                        <input type="text" class="form-control" id="unidadeProduto" name="unidadeProduto" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Cadastrar</button>
-                </form>
+    <!-- Botão flutuante -->
+    <button type="button" class="btn btn-primary btn-floating floating-button" data-toggle="modal" data-target="#modalCadastrarProduto">
+        <i class="fas fa-plus"></i>
+    </button>
+    <!-- Modal Cadastrar Produto -->
+    <div class="modal fade" id="modalCadastrarProduto" tabindex="-1" role="dialog" aria-labelledby="modalCadastrarProdutoLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCadastrarProdutoLabel">Cadastrar Produto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('cadastrar_produto') }}" method="post">
+                        <div class="form-group">
+                            <label for="nome">Nome:</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="descricao">Descrição:</label>
+                            <input type="text" class="form-control" id="descricao" name="descricao" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="preco">Preço:</label>
+                            <input type="number" class="form-control" id="preco" name="preco" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoria">Categoria:</label>
+                            <input type="text" class="form-control" id="categoria" name="categoria" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="unidadeProduto">Unidade:</label>
+                            <input type="text" class="form-control" id="unidadeProduto" name="unidadeProduto" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Cadastrar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+    <!-- Modal Deletar Produto -->
+    <div class="modal fade" id="modalDeletar" tabindex="-1" role="dialog" aria-labelledby="modalDeletarLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDeletarLabel">Deletar Produto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja deletar este produto?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <form id="formDeletar" action="" method="post">
+                        <button type="submit" class="btn btn-danger">Deletar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modais de Edição -->
-{% for key, produto in produtos.items() %}
-<div class="modal fade" id="modalEditar{{ key }}" tabindex="-1" role="dialog" aria-labelledby="modalEditar{{ key }}Label" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalEditar{{ key }}Label">Editar Produto</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form action="{{ url_for('editar_produto', id=key) }}" method="post">
-                    <div class="form-group">
-                        <label for="nome">Nome</label>
-                        <input type="text" name="nome" class="form-control" value="{{ produto.nome }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="descricao">Descrição</label>
-                        <input type="text" name="descricao" class="form-control" value="{{ produto.descricao }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="preco">Preço</label>
-                        <input type="number" name="preco" class="form-control" value="{{ produto.preco }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="categoria">Categoria</label>
-                        <input type="text" name="categoria" class="form-control" value="{{ produto.categoria }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="unidadeProduto">Unidade</label>
-                        <input type="text" name="unidadeProduto" class="form-control" value="{{ produto.unidadeProduto }}" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Atualizar</button>
-                </form>
+    {% for key, produto in produtos.items() %}
+    <div class="modal fade" id="modalEditar{{ key }}" tabindex="-1" role="dialog" aria-labelledby="modalEditar{{ key }}Label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditar{{ key }}Label">Editar Produto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('editar_produto', id=key) }}" method="post">
+                        <div class="form-group">
+                            <label for="nome">Nome</label>
+                            <input type="text" name="nome" class="form-control" value="{{ produto.nome }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="descricao">Descrição</label>
+                            <input type="text" name="descricao" class="form-control" value="{{ produto.descricao }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="preco">Preço</label>
+                            <input type="number" name="preco" class="form-control" value="{{ produto.preco }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoria">Categoria</label>
+                            <input type="text" name="categoria" class="form-control" value="{{ produto.categoria }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="unidadeProduto">Unidade</label>
+                            <input type="text" name="unidadeProduto" class="form-control" value="{{ produto.unidadeProduto }}" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
-{% endfor %}
+    {% endfor %}
 
     <!-- jQuery deve vir antes do Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var deleteUrlBase = "{{ url_for('deletar_produto', id='ID_PLACEHOLDER') }}";
+        $('#modalDeletar').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var productId = button.data('id');
+            var form = $('#formDeletar');
+            form.attr('action', deleteUrlBase.replace('ID_PLACEHOLDER', productId));
+        });
+    </script>
 </body>
 
 </html>

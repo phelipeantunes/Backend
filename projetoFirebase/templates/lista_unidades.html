@@ -91,6 +91,7 @@
                     <tr>
                         <th>Nome</th>
                         <th>Localização</th>
+                        <th>Telefone</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -99,12 +100,12 @@
                     <tr>
                         <td>{{ unidade.nome }}</td>
                         <td>{{ unidade.localizacao }}</td>
+                        <td>{{ unidade.telefone }}</td>
                         <td>
                             <!-- Botão para abrir o modal de edição -->
                             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEditar{{ key }}">Editar</button>
-                            <form action="{{ url_for('deletar_unidade', id=key) }}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm">Deletar</button>
-                            </form>
+                            <!-- Botão para abrir o modal de deletar -->
+                            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalDeletar" data-id="{{ key }}">Deletar</button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -134,7 +135,34 @@
                                     <label for="localizacao">Localização:</label>
                                     <input type="text" class="form-control" id="localizacao" name="localizacao" required>
                                 </div>
+                                <div class="form-group">
+                                    <label for="telefone">Telefone:</label>
+                                    <input type="text" class="form-control" id="telefone" name="telefone" required>
+                                </div>
                                 <button type="submit" class="btn btn-primary">Cadastrar</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Deletar Unidade -->
+            <div class="modal fade" id="modalDeletar" tabindex="-1" role="dialog" aria-labelledby="modalDeletarLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalDeletarLabel">Deletar Unidade</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Tem certeza que deseja deletar esta unidade?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <form id="formDeletarUnidade" method="post" action="">
+                                <button type="submit" class="btn btn-danger">Confirmar</button>
                             </form>
                         </div>
                     </div>
@@ -161,7 +189,12 @@
                                     <label for="localizacao">Localização</label>
                                     <input type="text" name="localizacao" class="form-control" value="{{ unidade.localizacao }}" required>
                                 </div>
+                                <div class="form-group">
+                                    <label for="telefone">Telefone</label>
+                                    <input type="text" name="telefone" class="form-control" value="{{ unidade.telefone }}" required>
+                                </div>
                                 <button type="submit" class="btn btn-primary">Atualizar</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                             </form>
                         </div>
                     </div>
@@ -172,6 +205,20 @@
             <!-- jQuery deve vir antes do Bootstrap JS -->
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
             <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+            <script>
+                var deleteUrlBase = "{{ url_for('deletar_unidade', id='ID_PLACEHOLDER') }}";
+                $('#modalDeletar').on('show.bs.modal', function (event) {
+                    var button = $(event.relatedTarget);
+                    var unitId = button.data('id');
+                    var form = $('#formDeletarUnidade');
+                    form.attr('action', deleteUrlBase.replace('ID_PLACEHOLDER', unitId));
+                });
+            </script>
+            
+            
+            
+        </div>
+    </div>
 </body>
 
 </html>

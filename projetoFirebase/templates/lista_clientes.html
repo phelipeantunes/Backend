@@ -82,9 +82,6 @@
             </ul>
         </div>
         <div class="content">
-
-
-
             <div class="header">
                 <h1 class="mt-5">Lista de Clientes</h1>
                 <a href="/logout" class="btn btn-danger">Sair</a>
@@ -95,12 +92,11 @@
                     <tr>
                         <th>Nome</th>
                         <th>Email</th>
-                        <th>Telefone </th>
-                        <th>Endereço </th>
+                        <th>Telefone</th>
+                        <th>Endereço</th>
                         <th>Gênero</th>
                         <th>Estado Civil</th>
                         <th>Idade</th>
-                        <!-- <th>Unidade Cliente ID</th> -->
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -114,15 +110,11 @@
                         <td>{% if cliente.genero %} Masculino {% else %} Feminino {% endif %}</td>
                         <td>{{ cliente.estadoCivil }}</td>
                         <td>{{ cliente.idade }}</td>
-                        <!-- <td>{{ cliente.telefone }}</td> -->
                         <td>
                             <!-- Botão para abrir o modal de edição -->
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
-                                data-target="#modalEditar{{ key }}">Editar</button>
-                            <form action="{{ url_for('deletar_cliente', id=key) }}" method="post"
-                                style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm">Deletar</button>
-                            </form>
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEditar{{ key }}">Editar</button>
+                            <!-- Botão para abrir o modal de deletar -->
+                            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalDeletar" data-id="{{ key }}">Deletar</button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -130,16 +122,13 @@
             </table>
         </div>
     </div>
-    </div>
     <!-- Botão flutuante -->
-    <button type="button" class="btn btn-primary btn-floating floating-button" data-toggle="modal"
-        data-target="#modalCadastrarCliente">
+    <button type="button" class="btn btn-primary btn-floating floating-button" data-toggle="modal" data-target="#modalCadastrarCliente">
         <i class="fas fa-plus"></i>
     </button>
 
     <!-- Modal Cadastrar Cliente -->
-    <div class="modal fade" id="modalCadastrarCliente" tabindex="-1" role="dialog"
-        aria-labelledby="modalCadastrarClienteLabel" aria-hidden="true">
+    <div class="modal fade" id="modalCadastrarCliente" tabindex="-1" role="dialog" aria-labelledby="modalCadastrarClienteLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -188,6 +177,30 @@
                             <input type="idade" class="form-control" id="idade" name="idade" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Cadastrar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Deletar Cliente -->
+    <div class="modal fade" id="modalDeletar" tabindex="-1" role="dialog" aria-labelledby="modalDeletarLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDeletarLabel">Deletar Cliente</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja deletar este cliente?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <form id="formDeletar" action="" method="post">
+                        <button type="submit" class="btn btn-danger">Deletar</button>
                     </form>
                 </div>
             </div>
@@ -196,8 +209,7 @@
 
     <!-- Modais de Edição -->
     {% for key, cliente in clientes.items() %}
-    <div class="modal fade" id="modalEditar{{ key }}" tabindex="-1" role="dialog"
-        aria-labelledby="modalEditar{{ key }}Label" aria-hidden="true">
+    <div class="modal fade" id="modalEditar{{ key }}" tabindex="-1" role="dialog" aria-labelledby="modalEditar{{ key }}Label" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -241,12 +253,12 @@
                                 <option value="Viúvo">Viúvo(a)</option>
                             </select>
                         </div>
-                        
                         <div class="form-group">
                             <label for="idade">Idade:</label>
                             <input type="number" class="form-control" id="idade" name="idade" value="{{ cliente['idade'] }}" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Atualizar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                     </form>
                 </div>
             </div>
@@ -257,6 +269,15 @@
     <!-- jQuery deve vir antes do Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var deleteUrlBase = "{{ url_for('deletar_cliente', id='ID_PLACEHOLDER') }}";
+        $('#modalDeletar').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var clientId = button.data('id');
+            var form = $('#formDeletar');
+            form.attr('action', deleteUrlBase.replace('ID_PLACEHOLDER', clientId));
+        });
+    </script>
 </body>
 
 </html>
