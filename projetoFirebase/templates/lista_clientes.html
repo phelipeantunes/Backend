@@ -30,8 +30,8 @@
         }
 
         .content {
-            margin-left: 250px;
-            padding: 20px;
+            margin-left: 45px;
+            /* padding: 20px; */
             flex-grow: 1;
         }
 
@@ -97,6 +97,7 @@
                         <th>Gênero</th>
                         <th>Estado Civil</th>
                         <th>Idade</th>
+                        <th>CPF</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -110,11 +111,14 @@
                         <td>{% if cliente.genero %} Masculino {% else %} Feminino {% endif %}</td>
                         <td>{{ cliente.estadoCivil }}</td>
                         <td>{{ cliente.idade }}</td>
+                        <td>{{ cliente.cpf }}</td>
                         <td>
                             <!-- Botão para abrir o modal de edição -->
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEditar{{ key }}">Editar</button>
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                                data-target="#modalEditar{{ key }}">Editar</button>
                             <!-- Botão para abrir o modal de deletar -->
-                            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#modalDeletar" data-id="{{ key }}">Deletar</button>
+                            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
+                                data-target="#modalDeletar" data-id="{{ key }}">Deletar</button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -123,12 +127,14 @@
         </div>
     </div>
     <!-- Botão flutuante -->
-    <button type="button" class="btn btn-primary btn-floating floating-button" data-toggle="modal" data-target="#modalCadastrarCliente">
+    <button type="button" class="btn btn-primary btn-floating floating-button" data-toggle="modal"
+        data-target="#modalCadastrarCliente">
         <i class="fas fa-plus"></i>
     </button>
 
     <!-- Modal Cadastrar Cliente -->
-    <div class="modal fade" id="modalCadastrarCliente" tabindex="-1" role="dialog" aria-labelledby="modalCadastrarClienteLabel" aria-hidden="true">
+    <div class="modal fade" id="modalCadastrarCliente" tabindex="-1" role="dialog"
+        aria-labelledby="modalCadastrarClienteLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -171,10 +177,14 @@
                                 <option value="Divorciado">Divorciado(a)</option>
                                 <option value="Viúvo">Viúvo(a)</option>
                             </select>
-                        </div>                        
+                        </div>
                         <div class="form-group">
                             <label for="idade">Idade:</label>
                             <input type="idade" class="form-control" id="idade" name="idade" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cpf">CPF:</label>
+                            <input type="text" class="form-control" id="cpf" name="cpf" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Cadastrar</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -185,7 +195,8 @@
     </div>
 
     <!-- Modal Deletar Cliente -->
-    <div class="modal fade" id="modalDeletar" tabindex="-1" role="dialog" aria-labelledby="modalDeletarLabel" aria-hidden="true">
+    <div class="modal fade" id="modalDeletar" tabindex="-1" role="dialog" aria-labelledby="modalDeletarLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -209,7 +220,8 @@
 
     <!-- Modais de Edição -->
     {% for key, cliente in clientes.items() %}
-    <div class="modal fade" id="modalEditar{{ key }}" tabindex="-1" role="dialog" aria-labelledby="modalEditar{{ key }}Label" aria-hidden="true">
+    <div class="modal fade" id="modalEditar{{ key }}" tabindex="-1" role="dialog"
+        aria-labelledby="modalEditar{{ key }}Label" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -226,21 +238,25 @@
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" name="email" class="form-control" value="{{ cliente['email'] }}" required>
+                            <input type="email" name="email" class="form-control" value="{{ cliente['email'] }}"
+                                required>
                         </div>
                         <div class="form-group">
                             <label for="telefone">Telefone:</label>
-                            <input type="text" class="form-control" name="telefone" value="{{ cliente['telefone'] }}" required>
+                            <input type="text" class="form-control" name="telefone" value="{{ cliente['telefone'] }}"
+                                required>
                         </div>
                         <div class="form-group">
                             <label for="endereco">Endereço:</label>
-                            <input type="text" class="form-control" id="endereco" name="endereco" value="{{ cliente['endereco'] }}" required>
+                            <input type="text" class="form-control" id="endereco" name="endereco"
+                                value="{{ cliente['endereco'] }}" required>
                         </div>
                         <div class="form-group">
                             <label for="genero">Gênero:</label>
                             <select class="form-control" id="genero" name="genero" required>
                                 <option value="true" {% if cliente['genero'] %} selected {% endif %}>Masculino</option>
-                                <option value="false" {% if not cliente['genero'] %} selected {% endif %}>Feminino</option>
+                                <option value="false" {% if not cliente['genero'] %} selected {% endif %}>Feminino
+                                </option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -255,7 +271,12 @@
                         </div>
                         <div class="form-group">
                             <label for="idade">Idade:</label>
-                            <input type="number" class="form-control" id="idade" name="idade" value="{{ cliente['idade'] }}" required>
+                            <input type="number" class="form-control" id="idade" name="idade"
+                                value="{{ cliente['idade'] }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cpf">CPF:</label>
+                            <input type="text" class="form-control" id="cpf" name="cpf" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Atualizar</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -269,6 +290,9 @@
     <!-- jQuery deve vir antes do Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
     <script>
         var deleteUrlBase = "{{ url_for('deletar_cliente', id='ID_PLACEHOLDER') }}";
         $('#modalDeletar').on('show.bs.modal', function (event) {
@@ -276,6 +300,71 @@
             var clientId = button.data('id');
             var form = $('#formDeletar');
             form.attr('action', deleteUrlBase.replace('ID_PLACEHOLDER', clientId));
+        });
+    </script>
+    <script>
+        // Função para validar CPF
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g, '');  // Remove caracteres não numéricos
+            if (cpf.length !== 11 ||
+                cpf === '00000000000' ||
+                cpf === '11111111111' ||
+                cpf === '22222222222' ||
+                cpf === '33333333333' ||
+                cpf === '44444444444' ||
+                cpf === '55555555555' ||
+                cpf === '66666666666' ||
+                cpf === '77777777777' ||
+                cpf === '88888888888' ||
+                cpf === '99999999999') {
+                return false;
+            }
+
+            let soma = 0;
+            let resto;
+
+            for (let i = 1; i <= 9; i++) {
+                soma = soma + parseInt(cpf.substring(i - 1, i)) * (11 - i);
+            }
+            resto = (soma * 10) % 11;
+
+            if ((resto === 10) || (resto === 11)) {
+                resto = 0;
+            }
+
+            if (resto !== parseInt(cpf.substring(9, 10))) {
+                return false;
+            }
+
+            soma = 0;
+            for (let i = 1; i <= 10; i++) {
+                soma = soma + parseInt(cpf.substring(i - 1, i)) * (12 - i);
+            }
+            resto = (soma * 10) % 11;
+
+            if ((resto === 10) || (resto === 11)) {
+                resto = 0;
+            }
+
+            if (resto !== parseInt(cpf.substring(10, 11))) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Quando o documento estiver pronto
+        $(document).ready(function () {
+            $('#formCadastroCliente').submit(function () {
+                const cpf = $('#cpf').val();
+
+                if (!validarCPF(cpf)) {
+                    alert('CPF inválido. Por favor, digite um CPF válido.');
+                    return false;  // Impede o envio do formulário
+                }
+
+                return true;  // Permite o envio do formulário
+            });
         });
     </script>
 </body>

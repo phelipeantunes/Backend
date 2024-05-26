@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from collections import defaultdict
+
 import pyrebase
 
 app = Flask(__name__, static_folder='assests')
@@ -18,6 +20,8 @@ firebaseConfig = {
 firebase = pyrebase.initialize_app(firebaseConfig)
 auth = firebase.auth()
 db = firebase.database()
+
+
 
 # Rota inicial
 @app.route('/')
@@ -73,15 +77,31 @@ def register():
     else:
         return render_template('register.html')
 
-# Rota de cadastro de produto
+@app.route('/lista_produtos')
+def lista_produtos():
+    produtos = db.child("produtos").get().val()
+    unidades = db.child("unidades").get().val()
+    categorias = set(produto['categoria'] for produto in produtos.values())  # Extract unique categories from produtos
+    return render_template('lista_produtos.html', produtos=produtos, unidades=unidades, categorias=categorias)
+
+
+# Rota para cadastrar produto
 @app.route('/cadastrar_produto', methods=['GET', 'POST'])
 def cadastrar_produto():
+    produto = {}  # Initialize produto as an empty dictionary
     if request.method == 'POST':
         nome = request.form['nome']
         descricao = request.form['descricao']
         preco = request.form['preco']
         categoria = request.form['categoria']
         unidadeProduto = request.form['unidadeProduto']
+        nova_categoria = request.form['nova_categoria']
+
+        if categoria == 'nova_categoria' and nova_categoria:
+            categorias = db.child("categorias").get().val() or []
+            categorias.append(nova_categoria)
+            db.child("categorias").set(categorias)
+            categoria = nova_categoria
 
         produto = {
             "nome": nome,
@@ -95,8 +115,9 @@ def cadastrar_produto():
 
         return redirect(url_for('lista_produtos'))
     else:
-        return render_template('cadastrar_produto.html')
-
+        unidades = db.child("unidades").get().val()
+        categorias = db.child("categorias").get().val() or []
+        return render_template('cadastrar_produto.html', unidades=unidades, categorias=categorias, produto=produto)
 
 # Rota de edição de produto
 @app.route('/editar_produto/<id>', methods=['GET', 'POST'])
@@ -107,7 +128,7 @@ def editar_produto(id):
         preco = request.form['preco']
         categoria = request.form['categoria']
         unidadeProduto = request.form['unidadeProduto']
-        
+
         db.child("produtos").child(id).update({
             "nome": nome,
             "descricao": descricao,
@@ -118,25 +139,17 @@ def editar_produto(id):
         return redirect(url_for('lista_produtos'))
     else:
         produto = db.child("produtos").child(id).get().val()
-        return render_template('editar_produto.html', produto=produto)
-
-
-
-# Rota de listagem de produtos
-@app.route('/lista_produtos')
-def lista_produtos():
-    produtos = db.child("produtos").get().val()
-    return render_template('lista_produtos.html', produtos=produtos)
-
-
-
-
+        unidades = db.child("unidades").get().val()
+        categorias = db.child("categorias").get().val() or []
+        return render_template('editar_produto.html', unidades=unidades, categorias=categorias, produto=produto)
 
 # Rota de deleção de produto
 @app.route('/deletar_produto/<id>', methods=['POST'])
 def deletar_produto(id):
     db.child("produtos").child(id).remove()
     return redirect(url_for('lista_produtos'))
+
+
 
 @app.route('/lista_clientes')
 def lista_clientes():
@@ -156,6 +169,7 @@ def cadastrar_cliente():
     genero_bool = genero_str == 'true'   # Converte para booleano
     estadoCivil = request.form['estadoCivil']
     idade = request.form['idade']
+    cpf = request.form['cpf']
     
     cliente = {
         'nome': nome,
@@ -164,7 +178,8 @@ def cadastrar_cliente():
         'endereco': endereco,
         'genero': genero_bool,  # Armazena o booleano no banco de dados
         'estadoCivil': estadoCivil,
-        'idade': idade 
+        'idade': idade,
+        'cpf': cpf 
     }
     
     db.child("clientes").push(cliente)
@@ -182,6 +197,7 @@ def editar_cliente(id):
         genero_bool = genero_str == 'true'   # Converte para booleano
         estadoCivil = request.form['estadoCivil']
         idade = request.form['idade']
+        cpf = request.form['cpf']
         
         db.child("clientes").child(id).update({
             "nome": nome,
@@ -190,7 +206,8 @@ def editar_cliente(id):
             "endereco": endereco,
             "genero": genero_bool,  # Armazena o booleano no banco de dados
             "estadoCivil": estadoCivil, 
-            "idade": idade 
+            "idade": idade,
+            'cpf': cpf
         })
         
         return redirect(url_for('lista_clientes'))
@@ -255,60 +272,113 @@ def deletar_unidade(id):
     return redirect(url_for('lista_unidades'))
 
 
-# Rota de listagem de vendas
 @app.route('/lista_vendas')
 def lista_vendas():
-    vendas = db.child("vendas").get().val()
-    if vendas is None:
-        vendas = {}  # Se não houver vendas, inicializa como um dicionário vazio
-    return render_template('lista_vendas.html', vendas=vendas)
+    # Obter as vendas do banco de dados Firebase ou inicializar uma lista vazia
+    vendas = db.child("vendas").get().val() or {}
 
-# Rota de cadastro de venda
-@app.route('/cadastrar_venda', methods=['GET', 'POST'])
+    # Obter os produtos do banco de dados Firebase
+    produtos = db.child("produtos").get().val()
+
+    # Calcular o total de cada venda
+    for venda_id, venda in vendas.items():
+        produto_id = venda['produto_id']
+        quantidade = venda['quantidade']
+        preco = produtos[produto_id]['preco']
+        venda['totpedido'] = preco * quantidade
+
+    clientes = db.child("clientes").get().val()
+    return render_template('lista_vendas.html', vendas=vendas, clientes=clientes, produtos=produtos)
+
+
+
+
+# Rota para cadastrar uma nova venda
+@app.route('/cadastrar_venda', methods=['POST'])
 def cadastrar_venda():
-    if request.method == 'POST':
-        cliente = request.form['cliente']
-        produto = request.form['produto']
-        quantidade = request.form['quantidade']
-        totpedido = request.form['totpedido']
-        data = request.form['data']  # Adicione isso se houver um campo de data no formulário
+    # Obter as vendas do banco de dados Firebase ou inicializar uma lista vazia
+    vendas = db.child("vendas").get().val() or {}
 
-        venda = {"cliente": cliente,
-                  "produto": produto,
-                   "quantidade": quantidade, 
-                   "data": data,
-                   "totpedido":totpedido} 
-        db.child("vendas").push(venda)
-        return redirect(url_for('lista_vendas'))
-    else:
-        return render_template('cadastrar_venda.html')
+    # Obter os produtos do banco de dados Firebase
+    produtos = db.child("produtos").get().val()
+    
+    cliente_id = request.form['cliente']
+    produto_id = request.form['produto']
+    quantidade = int(request.form['quantidade'])
+    data = request.form['data']
+    
+    produto = produtos[produto_id]
+    totpedido = produto['preco'] * quantidade
 
-# Rota de edição de venda
-@app.route('/editar_venda/<id>', methods=['GET', 'POST'])
+    # Gerar um ID para a nova venda
+    venda_id = len(vendas) + 1
+
+    # Adicionar a nova venda à lista de vendas
+    nova_venda = {
+        "cliente": cliente_id,
+        "data": data,
+        "produto_id": produto_id,
+        "quantidade": quantidade,
+        "totpedido": totpedido
+    }
+
+    vendas[f"-NyqERd{venda_id:03d}"] = nova_venda
+
+    # Atualizar os dados de vendas no banco de dados Firebase
+    db.child("vendas").set(vendas)
+
+    # Adicionar o total do pedido ao banco de dados Firebase
+    db.child("vendas").child(f"-NyqERd{venda_id:03d}").update({"totpedido": totpedido})
+
+    return redirect(url_for('lista_vendas'))
+
+
+
+
+
+
+@app.route('/editar_venda/<id>', methods=['POST'])
 def editar_venda(id):
-    if request.method == 'POST':
-        cliente = request.form['cliente']
-        produto = request.form['produto']
-        quantidade = request.form['quantidade']
-        totpedido = request.form['totpedido']
+    # Obter os produtos do banco de dados Firebase
+    produtos = db.child("produtos").get().val()
+    
+    # Obter a venda específica que está sendo editada
+    venda = db.child("vendas").child(id).get().val()
+    
+    if venda:
+        cliente_id = request.form['cliente']
+        produto_id = request.form['produto']
+        quantidade = int(request.form['quantidade'])
         data = request.form['data']
 
-        venda = {"cliente": cliente, 
-                 "produto": produto, 
-                 "quantidade": quantidade, 
-                 "data": data,
-                 "totpedido":totpedido}
-        db.child("vendas").child(id).update(venda)
-        return redirect(url_for('lista_vendas'))
-    else:
-        venda = db.child("vendas").child(id).get().val()
-        return render_template('editar_venda.html', venda=venda)
+        # Certifique-se de que o produto existe antes de acessar suas informações
+        if produto_id in produtos:
+            produto = produtos[produto_id]
+            totpedido = produto['preco'] * quantidade
 
-# Rota de deleção de venda
+            updated_venda = {
+                "cliente": cliente_id,
+                "data": data,
+                "produto_id": produto_id,
+                "quantidade": quantidade,
+                "totpedido": totpedido
+            }
+
+            db.child("vendas").child(id).update(updated_venda)
+
+    return redirect(url_for('lista_vendas'))
+
+
+
 @app.route('/deletar_venda/<id>', methods=['POST'])
 def deletar_venda(id):
-    db.child("vendas").child(id).remove()
+    if id in vendas:
+        del vendas[id]
     return redirect(url_for('lista_vendas'))
+
+
+
+
 
 
 if __name__ == '__main__':

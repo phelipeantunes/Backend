@@ -30,8 +30,8 @@
         }
 
         .content {
-            margin-left: 250px;
-            padding: 20px;
+            margin-left: 45px;
+            /* padding: 20px; */
             flex-grow: 1;
         }
 
@@ -137,7 +137,8 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="telefone">Telefone:</label>
-                                    <input type="text" class="form-control" id="telefone" name="telefone" required>
+                                    <input type="tel" class="form-control" id="telefone" name="telefone" required pattern="\(\d{2}\) \d{4,5}-\d{4}">
+                                    <small class="form-text text-muted">Formato aceito: (99) 99999-9999 ou (99) 9999-9999</small>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Cadastrar</button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -191,7 +192,8 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="telefone">Telefone</label>
-                                    <input type="text" name="telefone" class="form-control" value="{{ unidade.telefone }}" required>
+                                    <input type="tel" name="telefone" class="form-control" value="{{ unidade.telefone }}" required pattern="\(\d{2}\) \d{4,5}-\d{4}">
+                                    <small class="form-text text-muted">Formato aceito: (99) 99999-9999 ou (99) 9999-9999</small>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Atualizar</button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -214,9 +216,6 @@
                     form.attr('action', deleteUrlBase.replace('ID_PLACEHOLDER', unitId));
                 });
             </script>
-            
-            
-            
         </div>
     </div>
 </body>
