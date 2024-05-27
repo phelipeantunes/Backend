@@ -112,10 +112,11 @@
 
                         <td>{{ venda.quantidade }}</td>
                         <td>{{ venda.data }}</td>
-                        <td data-produto-id="{{ venda.produto_id }}" data-preco="{{ venda.preco }}" data-key="{{ key }}">
+                        <td data-produto-id="{{ venda.produto_id }}" data-preco="{{ venda.preco }}"
+                            data-key="{{ key }}">
                             {{ venda.totpedido }}
                         </td>
-                        
+
                         <td>
                             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
                                 data-target="#modalEditar{{ key }}">Editar</button>
@@ -287,18 +288,6 @@
         </div>
     </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <!-- Bootstrap JS -->
@@ -315,18 +304,18 @@
                     $(this).find('input[name="totpedido"]').val(total.toFixed(2));
                 });
             }
-    
+
             $('#produto, #quantidade').on('change keyup', function () {
                 updateTotalPedido();
             });
         });
     </script>
-    
-    
-    
-    
 
-    
+
+
+
+
+
 </body>
 
 </html>

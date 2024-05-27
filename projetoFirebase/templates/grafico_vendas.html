@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Vendas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Dashboard de Vendas</h1>
+    
+    <canvas id="totalVendasChart"></canvas>
+    <canvas id="faturamentoTotalChart"></canvas>
+    <canvas id="faturamentoGeneroChart"></canvas>
+    <canvas id="faturamentoProdutoChart"></canvas>
+    <canvas id="faturamentoLocalizacaoChart"></canvas>
+    <canvas id="faturamentoTempoChart"></canvas>
+    <div id="valorMedioProduto"></div>
+    <div id="quantidadeProdutosVendidos"></div>
+
+    <script>
+        // Função para criar gráficos
+        function createChart(ctx, type, data, options) {
+            new Chart(ctx, {
+                type: type,
+                data: data,
+                options: options
+            });
+        }
+
+        // Fetch e exibir gráficos
+        fetch('/api/relatorio_total_vendas').then(response => response.json()).then(data => {
+            document.getElementById('totalVendasChart').innerHTML = `Total de Vendas: ${data.total_vendas}`;
+        });
+
+        fetch('/api/relatorio_faturamento_total').then(response => response.json()).then(data => {
+            document.getElementById('faturamentoTotalChart').innerHTML = `Faturamento Total: ${data.faturamento_total}`;
+        });
+
+        fetch('/api/relatorio_faturamento_genero').then(response => response.json()).then(data => {
+            const ctx = document.getElementById('faturamentoGeneroChart').getContext('2d');
+            createChart(ctx, 'pie', {
+                labels: ['Masculino', 'Feminino'],
+                datasets: [{
+                    label: 'Faturamento por Gênero',
+                    data: [data.masculino, data.feminino],
+                    backgroundColor: ['#36A2EB', '#FF6384']
+                }]
+            });
+        });
+
+        fetch('/api/relatorio_faturamento_produto').then(response => response.json()).then(data => {
+            const ctx = document.getElementById('faturamentoProdutoChart').getContext('2d');
+            const labels = Object.keys(data);
+            const values = Object.values(data);
+            createChart(ctx, 'bar', {
+                labels: labels,
+                datasets: [{
+                    label: 'Faturamento por Produto',
+                    data: values,
+                    backgroundColor: '#FFCE56'
+                }]
+            });
+        });
+
+        fetch('/api/relatorio_faturamento_localizacao').then(response => response.json()).then(data => {
+            const ctx = document.getElementById('faturamentoLocalizacaoChart').getContext('2d');
+            const labels = Object.keys(data);
+            const values = Object.values(data);
+            createChart(ctx, 'bar', {
+                labels: labels,
+                datasets: [{
+                    label: 'Faturamento por Localização',
+                    data: values,
+                    backgroundColor: '#4BC0C0'
+                }]
+            });
+        });
+
+        fetch('/api/relatorio_valor_medio_produto').then(response => response.json()).then(data => {
+            document.getElementById('valorMedioProduto').innerHTML = `Valor Médio do Produto: ${data.valor_medio_produto.toFixed(2)}`;
+        });
+
+        fetch('/api/relatorio_quantidade_produtos_vendidos').then(response => response.json()).then(data => {
+            document.getElementById('quantidadeProdutosVendidos').innerHTML = `Quantidade de Produtos Vendidos: ${data.quantidade_produtos_vendidos}`;
+        });
+
+        fetch('/api/relatorio_faturamento_tempo').then(response => response.json()).then(data => {
+            const ctx = document.getElementById('faturamentoTempoChart').getContext('2d');
+            createChart(ctx, 'line', {
+                labels: data.datas,
+                datasets: [{
+                    label: 'Faturamento ao Longo do Tempo',
+                    data: data.faturamentos,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, session
-from collections import defaultdict
-from firebase_admin import credentials
-from firebase_admin import auth
+from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+import traceback
 
 import pyrebase
+import pandas as pd
 
 app = Flask(__name__, static_folder='assests')
 
@@ -90,21 +90,29 @@ def register():
     else:
         return render_template('register.html')
 
-@app.route('/lista_produtos')
+# Rota de lista de produtos
+@app.route('/lista_produtos', methods=['GET', 'POST'])
 def lista_produtos():
-    if(getSession()):
-        produtos = db.child("produtos").get().val()
-        unidades = db.child("unidades").get().val()
-        categorias = set(produto['categoria'] for produto in produtos.values())  # Extract unique categories from produtos
-        return render_template('lista_produtos.html', produtos=produtos, unidades=unidades, categorias=categorias)
-    else:
-        return redirect(url_for('login'))
-
+    if request.method == 'GET':
+        if getSession():
+            produtos = db.child("produtos").get().val()
+            unidades = db.child("unidades").get().val()
+            categorias = set(produto['categoria'] for produto in produtos.values())  # Extract unique categories from produtos
+            return render_template('lista_produtos.html', produtos=produtos, unidades=unidades, categorias=categorias)
+        else:
+            return redirect(url_for('login'))
+    elif request.method == 'POST':
+        id_produto_deletar = request.form.get('id_produto_deletar')
+        try:
+            db.child("produtos").child(id_produto_deletar).remove()
+            return redirect(url_for('lista_produtos'))
+        except Exception as e:
+            traceback.print_exc()  # Imprime a exceção no console para depuração
+            return "Ocorreu um erro ao excluir o produto: " + str(e), 500
 
 # Rota para cadastrar produto
 @app.route('/cadastrar_produto', methods=['GET', 'POST'])
 def cadastrar_produto():
-    produto = {}  # Initialize produto as an empty dictionary
     if request.method == 'POST':
         nome = request.form['nome']
         descricao = request.form['descricao']
@@ -133,7 +141,7 @@ def cadastrar_produto():
     else:
         unidades = db.child("unidades").get().val()
         categorias = db.child("categorias").get().val() or []
-        return render_template('cadastrar_produto.html', unidades=unidades, categorias=categorias, produto=produto)
+        return render_template('cadastrar_produto.html', unidades=unidades, categorias=categorias)
 
 # Rota de edição de produto
 @app.route('/editar_produto/<id>', methods=['GET', 'POST'])
@@ -384,14 +392,59 @@ def editar_venda(id):
 
 @app.route('/deletar_venda/<id>', methods=['POST'])
 def deletar_venda(id):
-    if id in vendas:
-        del vendas[id]
-    return redirect(url_for('lista_vendas'))
+    if(getSession()):
+        # Obter as vendas do banco de dados Firebase
+        vendas = db.child("vendas").get().val() or {}
+        
+        if id in vendas:
+            del vendas[id]
+            # Atualizar os dados de vendas no banco de dados Firebase
+            db.child("vendas").set(vendas)
+        
+        return redirect(url_for('lista_vendas'))
+    else:
+        return redirect(url_for('login'))
 
 
+# # Exemplo de dados para o gráfico de vendas ao longo do tempo
+# dados_grafico_vendas = {
+#     'data': ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+#     'quantidade': [100, 120, 90, 150, 200, 180]
+# }
 
+# Função para calcular o faturamento total ao longo do tempo
+def calcular_faturamento_tempo():
+    vendas = db.child("vendas").get().val() or {}
+    produtos = db.child("produtos").get().val()
+    
+    data = []
+    faturamento_total = []
+    
+    for venda_id, venda in vendas.items():
+        data.append(venda['data'])
+        produto_id = venda['produto_id']
+        quantidade = venda['quantidade']
+        preco = produtos[produto_id]['preco']
+        total = float(preco) * float(quantidade)
+        
+        if not faturamento_total:
+            faturamento_total.append(total)
+        else:
+            faturamento_total.append(total + faturamento_total[-1])
+    
+    return data, faturamento_total
 
+# Rota para fornecer o relatório de faturamento ao longo do tempo via API
+@app.route('/api/relatorio_faturamento_tempo', methods=['GET'])
+def api_relatorio_faturamento_tempo():
+    data, faturamento_total = calcular_faturamento_tempo()
+    relatorio = {'data': data, 'faturamento_total': faturamento_total}
+    return jsonify(relatorio)
 
+# Rota para renderizar o dashboard de faturamento
+@app.route('/dashboard_faturamento')
+def dashboard_faturamento():
+    return render_template('grafico_vendas.html')
 
 if __name__ == '__main__':
     app.secret_key = 'your_secret_key_here'
