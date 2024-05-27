@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from collections import defaultdict
+from firebase_admin import credentials
+from firebase_admin import auth
 
 import pyrebase
 
@@ -22,14 +24,24 @@ auth = firebase.auth()
 db = firebase.database()
 
 
+def getSession():
+    try:
+        session['user']
+        return True
+    except:
+        return False
 
 # Rota inicial
 @app.route('/')
 def index():
-    if 'user' in session:
-        # Obter a lista de usuários do Firebase
-        usuarios = db.child("users").get().val()
-        return render_template('index.html', usuarios=usuarios)
+    if(getSession()):
+        if 'user' in session:
+            # Obter a lista de usuários do Firebase
+            # usuarios = db.child("users").get().val()
+            # return render_template('index.html', usuarios=usuarios)
+            return render_template('index.html')
+        else:
+            return redirect(url_for('login'))
     else:
         return redirect(url_for('login'))
 
@@ -63,13 +75,14 @@ def register():
         password = request.form['password']
 
         # Verifica se o email já está cadastrado
-        users = db.child("users").order_by_child("email").equal_to(email).get()
-        if users.each():
-            error = 'Email já está em uso. Por favor, use outro email.'
-            return render_template('register.html', error=error)
-
+        # users = db.child("users").order_by_child("email").equal_to(email).get()
+        # if users.each():
+        #     error = 'Email já está em uso. Por favor, use outro email.'
+        #     return render_template('register.html', error=error)
+        
         try:
             auth.create_user_with_email_and_password(email, password)
+            # db.child("users").push({[email]: "testenome"})
             return redirect(url_for('login'))
         except:
             error = 'Erro ao registrar. Por favor, tente novamente.'
@@ -79,10 +92,13 @@ def register():
 
 @app.route('/lista_produtos')
 def lista_produtos():
-    produtos = db.child("produtos").get().val()
-    unidades = db.child("unidades").get().val()
-    categorias = set(produto['categoria'] for produto in produtos.values())  # Extract unique categories from produtos
-    return render_template('lista_produtos.html', produtos=produtos, unidades=unidades, categorias=categorias)
+    if(getSession()):
+        produtos = db.child("produtos").get().val()
+        unidades = db.child("unidades").get().val()
+        categorias = set(produto['categoria'] for produto in produtos.values())  # Extract unique categories from produtos
+        return render_template('lista_produtos.html', produtos=produtos, unidades=unidades, categorias=categorias)
+    else:
+        return redirect(url_for('login'))
 
 
 # Rota para cadastrar produto
@@ -149,14 +165,15 @@ def deletar_produto(id):
     db.child("produtos").child(id).remove()
     return redirect(url_for('lista_produtos'))
 
-
-
 @app.route('/lista_clientes')
 def lista_clientes():
-    clientes = db.child("clientes").get().val()
-    if clientes is None:
-        clientes = {}
-    return render_template('lista_clientes.html', clientes=clientes)
+    if(getSession()):
+        clientes = db.child("clientes").get().val()
+        if clientes is None:
+            clientes = {}
+        return render_template('lista_clientes.html', clientes=clientes)
+    else:
+        return redirect(url_for('login'))
 
 # Rota para cadastrar cliente
 @app.route('/cadastrar_cliente', methods=['POST'])
@@ -220,13 +237,12 @@ def editar_cliente(id):
             flash('Cliente não encontrado.', 'error')
             return redirect(url_for('lista_clientes'))
 
-
-
 # Rota para deletar cliente
 @app.route('/deletar_cliente/<id>', methods=['POST'])
 def deletar_cliente(id):
     db.child("clientes").child(id).remove()
     return redirect(url_for('lista_clientes'))
+
 
 # Rota para cadastrar uma nova unidade
 @app.route('/cadastrar_unidade', methods=['POST'])
@@ -260,10 +276,13 @@ def editar_unidade(id):
 # Rota de listagem de unidades
 @app.route('/lista_unidades')
 def lista_unidades():
-    unidades = db.child("unidades").get().val()
-    if unidades is None:
-        unidades = {}
-    return render_template('lista_unidades.html', unidades=unidades)
+    if(getSession()):
+        unidades = db.child("unidades").get().val()
+        if unidades is None:
+            unidades = {}
+        return render_template('lista_unidades.html', unidades=unidades)
+    else:
+        return redirect(url_for('login'))
 
 # Rota de deleção de unidade
 @app.route('/deletar_unidade/<id>', methods=['POST'])
@@ -274,25 +293,25 @@ def deletar_unidade(id):
 
 @app.route('/lista_vendas')
 def lista_vendas():
-    # Obter as vendas do banco de dados Firebase ou inicializar uma lista vazia
-    vendas = db.child("vendas").get().val() or {}
+    if(getSession()):
+        # Obter as vendas do banco de dados Firebase ou inicializar uma lista vazia
+        vendas = db.child("vendas").get().val() or {}
 
-    # Obter os produtos do banco de dados Firebase
-    produtos = db.child("produtos").get().val()
+        # Obter os produtos do banco de dados Firebase
+        produtos = db.child("produtos").get().val()
 
-    # Calcular o total de cada venda
-    for venda_id, venda in vendas.items():
-        produto_id = venda['produto_id']
-        quantidade = venda['quantidade']
-        preco = produtos[produto_id]['preco']
-        venda['totpedido'] = preco * quantidade
+        # Calcular o total de cada venda
+        for venda_id, venda in vendas.items():
+            produto_id = venda['produto_id']
+            quantidade = venda['quantidade']
+            preco = produtos[produto_id]['preco']
+            total = float(preco) * float(quantidade)
+            venda['totpedido'] = format(total, '.2f')
 
-    clientes = db.child("clientes").get().val()
-    return render_template('lista_vendas.html', vendas=vendas, clientes=clientes, produtos=produtos)
-
-
-
-
+        clientes = db.child("clientes").get().val()
+        return render_template('lista_vendas.html', vendas=vendas, clientes=clientes, produtos=produtos)
+    else:
+        return redirect(url_for('login'))
 # Rota para cadastrar uma nova venda
 @app.route('/cadastrar_venda', methods=['POST'])
 def cadastrar_venda():
@@ -332,11 +351,6 @@ def cadastrar_venda():
 
     return redirect(url_for('lista_vendas'))
 
-
-
-
-
-
 @app.route('/editar_venda/<id>', methods=['POST'])
 def editar_venda(id):
     # Obter os produtos do banco de dados Firebase
@@ -367,8 +381,6 @@ def editar_venda(id):
             db.child("vendas").child(id).update(updated_venda)
 
     return redirect(url_for('lista_vendas'))
-
-
 
 @app.route('/deletar_venda/<id>', methods=['POST'])
 def deletar_venda(id):
