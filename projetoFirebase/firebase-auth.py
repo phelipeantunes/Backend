@@ -1,9 +1,9 @@
 from flask import Flask, render_template, jsonify
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import traceback
-
 import pyrebase
 import pandas as pd
+from collections import defaultdict
 
 app = Flask(__name__, static_folder='assests')
 
@@ -406,45 +406,152 @@ def deletar_venda(id):
         return redirect(url_for('login'))
 
 
-# # Exemplo de dados para o gráfico de vendas ao longo do tempo
-# dados_grafico_vendas = {
-#     'data': ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-#     'quantidade': [100, 120, 90, 150, 200, 180]
-# }
+# Funções para calcular os relatórios
+def calcular_total_vendas():
+    vendas = db.child("vendas").get().val() or {}
+    return len(vendas)
 
-# Função para calcular o faturamento total ao longo do tempo
+def calcular_faturamento_total():
+    vendas = db.child("vendas").get().val() or {}
+    produtos = db.child("produtos").get().val()
+    faturamento_total = 0
+    for venda in vendas.values():
+        produto_id = venda['produto_id']
+        quantidade = venda['quantidade']
+        preco = float(produtos[produto_id]['preco'])
+        faturamento_total += preco * float(quantidade)
+    return faturamento_total
+
+def calcular_faturamento_por_genero():
+    vendas = db.child("vendas").get().val() or {}
+    produtos = db.child("produtos").get().val()
+    clientes = db.child("clientes").get().val() or {}
+
+    faturamento_genero = {'masculino': 0, 'feminino': 0}
+    for venda in vendas.values():
+        cliente_id = venda['cliente']
+        if cliente_id in clientes:
+            genero = 'masculino' if clientes[cliente_id]['genero'] else 'feminino'
+            produto_id = venda['produto_id']
+            quantidade = venda['quantidade']
+            preco = float(produtos[produto_id]['preco'])
+            faturamento_genero[genero] += preco * float(quantidade)
+    return faturamento_genero
+
+def calcular_faturamento_por_produto():
+    vendas = db.child("vendas").get().val() or {}
+    produtos = db.child("produtos").get().val()
+    faturamento_produto = defaultdict(float)
+    for venda in vendas.values():
+        produto_id = venda['produto_id']
+        quantidade = venda['quantidade']
+        preco = float(produtos[produto_id]['preco'])
+        faturamento_produto[produtos[produto_id]['nome']] += preco * float(quantidade)
+    return faturamento_produto
+
+def calcular_faturamento_por_localizacao():
+    vendas = obter_todas_as_vendas()
+    produtos_ref = db.reference('produtos')
+    unidades_ref = db.reference('unidades')
+    
+    produtos = produtos_ref.get()
+    unidades = unidades_ref.get()
+    
+    faturamento_localizacao = {}
+
+    for venda_id, venda in vendas.items():
+        produto_id = venda.get('produto_id')
+        if produto_id:
+            produto = produtos.get(produto_id)
+            unidade_id = produto.get('unidadeProduto') if produto else None
+            if unidade_id:
+                valor = int(venda.get('totpedido', 0))  # Convertendo totpedido para int
+                if unidade_id in faturamento_localizacao:
+                    faturamento_localizacao[unidade_id] += valor
+                else:
+                    faturamento_localizacao[unidade_id] = valor
+
+    return faturamento_localizacao
+
+
+def calcular_valor_medio_produto():
+    produtos = db.child("produtos").get().val()
+    total_preco = sum(float(produto['preco']) for produto in produtos.values())
+    return total_preco / len(produtos) if produtos else 0
+
+def calcular_quantidade_produtos_vendidos():
+    vendas = db.child("vendas").get().val() or {}
+    quantidade_total = sum(venda['quantidade'] for venda in vendas.values())
+    return quantidade_total
+
 def calcular_faturamento_tempo():
     vendas = db.child("vendas").get().val() or {}
     produtos = db.child("produtos").get().val()
-    
-    data = []
-    faturamento_total = []
-    
-    for venda_id, venda in vendas.items():
-        data.append(venda['data'])
+    data_faturamento = defaultdict(float)
+    for venda in vendas.values():
+        data = venda['data']
         produto_id = venda['produto_id']
         quantidade = venda['quantidade']
-        preco = produtos[produto_id]['preco']
-        total = float(preco) * float(quantidade)
-        
-        if not faturamento_total:
-            faturamento_total.append(total)
-        else:
-            faturamento_total.append(total + faturamento_total[-1])
-    
-    return data, faturamento_total
+        preco = float(produtos[produto_id]['preco'])
+        data_faturamento[data] += preco * float(quantidade)
+    sorted_data = sorted(data_faturamento.items())
+    datas, faturamentos = zip(*sorted_data)
+    return datas, faturamentos
 
-# Rota para fornecer o relatório de faturamento ao longo do tempo via API
+def obter_todas_as_vendas():
+    ref = db.reference('vendas')
+    vendas = ref.get()
+    return vendas
+
+# Rotas para os relatórios
+@app.route('/api/relatorio_total_vendas', methods=['GET'])
+def api_relatorio_total_vendas():
+    total_vendas = calcular_total_vendas()
+    return jsonify({"total_vendas": total_vendas})
+
+@app.route('/api/relatorio_faturamento_total', methods=['GET'])
+def api_relatorio_faturamento_total():
+    faturamento_total = calcular_faturamento_total()
+    return jsonify({"faturamento_total": faturamento_total})
+
+@app.route('/api/relatorio_faturamento_genero', methods=['GET'])
+def api_relatorio_faturamento_genero():
+    faturamento_genero = calcular_faturamento_por_genero()
+    return jsonify(faturamento_genero)
+
+@app.route('/api/relatorio_faturamento_produto', methods=['GET'])
+def api_relatorio_faturamento_produto():
+    faturamento_produto = calcular_faturamento_por_produto()
+    return jsonify(faturamento_produto)
+
+@app.route('/api/relatorio_faturamento_localizacao', methods=['GET'])
+def api_relatorio_faturamento_localizacao():
+    try:
+        faturamento_localizacao = calcular_faturamento_por_localizacao()
+        return jsonify(faturamento_localizacao)
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/relatorio_valor_medio_produto', methods=['GET'])
+def api_relatorio_valor_medio_produto():
+    valor_medio_produto = calcular_valor_medio_produto()
+    return jsonify({"valor_medio_produto": valor_medio_produto})
+
+@app.route('/api/relatorio_quantidade_produtos_vendidos', methods=['GET'])
+def api_relatorio_quantidade_produtos_vendidos():
+    quantidade_produtos_vendidos = calcular_quantidade_produtos_vendidos()
+    return jsonify({"quantidade_produtos_vendidos": quantidade_produtos_vendidos})
+
 @app.route('/api/relatorio_faturamento_tempo', methods=['GET'])
 def api_relatorio_faturamento_tempo():
-    data, faturamento_total = calcular_faturamento_tempo()
-    relatorio = {'data': data, 'faturamento_total': faturamento_total}
-    return jsonify(relatorio)
+    datas, faturamentos = calcular_faturamento_tempo()
+    return jsonify({"datas": datas, "faturamentos": faturamentos})
 
-# Rota para renderizar o dashboard de faturamento
 @app.route('/dashboard_faturamento')
 def dashboard_faturamento():
     return render_template('grafico_vendas.html')
+
 
 if __name__ == '__main__':
     app.secret_key = 'your_secret_key_here'

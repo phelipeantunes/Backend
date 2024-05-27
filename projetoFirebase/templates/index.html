@@ -5,36 +5,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <title>CRUD Firebase</title>
     <style>
-        /* Estilo para o menu lateral */
         .sidebar {
-            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
             width: 250px;
-            background-color: #007bff !important;
-            color: #fff;
-            padding-top: 70px;
+            z-index: 1;
+            background-color: #4e73df;
+            padding-top: 1rem;
         }
 
-        .sidebar a {
-            padding: 10px 20px;
-            display: block;
+        .sidebar-brand {
+            padding: 1rem;
             color: #fff;
+            font-size: 1.25rem;
+            font-weight: 800;
+            text-align: center;
+            text-decoration: none;
         }
 
-        .sidebar a:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+        .sidebar-brand:hover {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .sidebar-nav {
+            margin-top: 1rem;
+        }
+
+        .sidebar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .sidebar-nav .nav-link:hover {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         .content {
-            margin-left: 45px;
-            /* padding: 20px; */
-            flex-grow: 1;
-        }
-
-        /* Estilo para os ícones */
-        .fa {
-            color: #fff;
+            margin-left: 250px;
+            padding: 20px;
         }
 
         .header {
@@ -43,6 +58,42 @@
             align-items: center;
             margin-bottom: 20px;
         }
+
+        .custom-box {
+            width: 200px;
+            height: 200px;
+            border-radius: 15px;
+            background-color: #d4dae0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .custom-box h2 {
+            font-size: 24px;
+            color: #343a40;
+        }
+
+        .main-content {
+            width: 200%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* Botão de sair */
+        .btn-sair {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+        }
     </style>
 </head>
 
@@ -50,25 +101,28 @@
     <div class="d-flex">
         <!-- Menu lateral -->
         <div class="sidebar">
-            <h2>Menu</h2>
-            <ul class="nav flex-column">
+            <a class="sidebar-brand" href="#">Gestão Microlins</a>
+            <ul class="nav flex-column sidebar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                    <a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home mr-2"></i>Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('lista_produtos') }}">Produtos</a>
+                    <a class="nav-link" href="{{ url_for('lista_produtos') }}"><i class="fas fa-box mr-2"></i>Produtos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('lista_clientes') }}">Clientes</a>
+                    <a class="nav-link" href="{{ url_for('lista_clientes') }}"><i class="fas fa-users mr-2"></i>Clientes</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('lista_unidades') }}">Unidades</a>
+                    <a class="nav-link" href="{{ url_for('lista_unidades') }}"><i class="fas fa-building mr-2"></i>Unidades</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('lista_vendas') }}">Vendas</a>
+                    <a class="nav-link" href="{{ url_for('lista_vendas') }}"><i class="fas fa-chart-line mr-2"></i>Vendas</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    <a class="nav-link" href="/dashboard_faturamento"><i class="fas fa-chart-line"></i> Dashboard de Faturamento</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
                 </li>
             </ul>
         </div>
@@ -76,24 +130,29 @@
         <div class="content">
             <div class="container">
                 <div class="container">
-                <div class="header">
-                    <h1>Projeto Sustentabilidade Microlins</h1>
-                    <a href="/logout" class="btn btn-danger">Sair</a>
+                    <div class="header">
+                        <h1>Projeto Sustentabilidade Microlins</h1>
+                        <a href="/logout" class="btn btn-danger btn-sair">Sair</a>
+                    </div>
                 </div>
-            </div>
 
-                POWER BI
+                POWER BI Simulado
                 <div class="main-content">
-                    <iframe title="Dashbord Escola" width="1024" height="804" src="https://app.powerbi.com/view?r=eyJrIjoiZGI2NGRjM2QtMTE4Yi00OGQ5LWJjODAtMmZlM2FiZDU4OGZlIiwidCI6IjE0Y2JkNWE3LWVjOTQtNDZiYS1iMzE0LWNjMGZjOTcyYTE2MSIsImMiOjh9" frameborder="0" allowFullScreen="true"></iframe>
+                    <iframe title="Dashboard Escola" width="100%" height="600px"
+                        src="https://app.powerbi.com/view?r=eyJrIjoiZGI2NGRjM2QtMTE4Yi00OGQ5LWJjODAtMmZlM2FiZDU4OGZlIiwidCI6IjE0Y2JkNWE3LWVjOTQtNDZiYS1iMzE0LWNjMGZjOTcyYTE2MSIsImMiOjh9"
+                        frameborder="0" allowFullScreen="true"></iframe>
                 </div>
             </div>
 
         </div>
-    
+
 
         <!-- jQuery deve vir antes do Bootstrap JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 
 </html>

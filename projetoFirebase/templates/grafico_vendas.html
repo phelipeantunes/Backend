@@ -1,23 +1,157 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Vendas</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <h1>Dashboard de Vendas</h1>
-    
-    <canvas id="totalVendasChart"></canvas>
-    <canvas id="faturamentoTotalChart"></canvas>
-    <canvas id="faturamentoGeneroChart"></canvas>
-    <canvas id="faturamentoProdutoChart"></canvas>
-    <canvas id="faturamentoLocalizacaoChart"></canvas>
-    <canvas id="faturamentoTempoChart"></canvas>
-    <div id="valorMedioProduto"></div>
-    <div id="quantidadeProdutosVendidos"></div>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <title>CRUD Firebase</title>
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 250px;
+            z-index: 1;
+            background-color: #4e73df;
+            padding-top: 1rem;
+        }
 
+        .sidebar-brand {
+            padding: 1rem;
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 800;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .sidebar-brand:hover {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .sidebar-nav {
+            margin-top: 1rem;
+        }
+
+        .sidebar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .sidebar-nav .nav-link:hover {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .custom-box {
+    width: 321px;
+    height: 58px;
+    border-radius: 15px;
+    background-color: #d4dae0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+        .custom-box h2 {
+            font-size: 24px;
+            color: #343a40;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="d-flex">
+   <!-- Menu lateral -->
+   <div class="sidebar">
+    <a class="sidebar-brand" href="#">Gestão Microlins</a>
+    <ul class="nav flex-column sidebar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home mr-2"></i>Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('lista_produtos') }}"><i class="fas fa-box mr-2"></i>Produtos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('lista_clientes') }}"><i class="fas fa-users mr-2"></i>Clientes</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('lista_unidades') }}"><i class="fas fa-building mr-2"></i>Unidades</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('lista_vendas') }}"><i class="fas fa-chart-line mr-2"></i>Vendas</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/dashboard_faturamento"><i class="fas fa-chart-line"></i> Dashboard de Faturamento</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+        </li>
+    </ul>
+</div>
+        <!-- Content -->
+        <div class="content">
+            <div class="container">
+                <div class="header">
+                    <h1>Projeto Sustentabilidade Microlins</h1>
+                    <a href="#" class="btn btn-danger">Sair</a>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 d-flex justify-content-center">
+                        <div id="valorMedioProduto" class="custom-box">
+                            <h2>Valor Médio Produto</h2>
+                            <p id="valorMedio"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex justify-content-center">
+                        <div id="quantidadeProdutosVendidos" class="custom-box">
+                            <h2>Quantidade Produtos Vendidos</h2>
+                            <b>
+                            <p id="quantidadeVendidos"></p>
+                        </b>
+                        </div>
+                    </div>
+                   
+                    <div class="col-md-6">
+                        <canvas id="faturamentoProdutoChart" style="width:100%;"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="faturamentoTempoChart" style="width:100%;"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="faturamentoGeneroChart" style="width:100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- jQuery deve vir antes do Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Função para criar gráficos
         function createChart(ctx, type, data, options) {
@@ -29,75 +163,124 @@
         }
 
         // Fetch e exibir gráficos
-        fetch('/api/relatorio_total_vendas').then(response => response.json()).then(data => {
-            document.getElementById('totalVendasChart').innerHTML = `Total de Vendas: ${data.total_vendas}`;
-        });
+        fetch('/api/relatorio_total_vendas')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error(data.error);
+                } else {
+                    const ctx = document.getElementById('faturamentoTotalChart').getContext('2d');
+                    createChart(ctx, 'bar', {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Faturamento Total',
+                            data: data.values,
+                            backgroundColor: '#FFCE56'
+                        }]
+                    });
+                }
+            })
+            .catch(error => console.error('Erro:', error));
 
-        fetch('/api/relatorio_faturamento_total').then(response => response.json()).then(data => {
-            document.getElementById('faturamentoTotalChart').innerHTML = `Faturamento Total: ${data.faturamento_total}`;
-        });
+        fetch('/api/relatorio_faturamento_genero')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error(data.error);
+                } else {
+                    const ctx = document.getElementById('faturamentoGeneroChart').getContext('2d');
+                    createChart(ctx, 'pie', {
+                        labels: ['Masculino', 'Feminino'],
+                        datasets: [{
+                            label: 'Faturamento por Gênero',
+                            data: [data.masculino, data.feminino],
+                            backgroundColor: ['#36A2EB', '#FF6384']
+                        }]
+                    });
+                }
+            })
+            .catch(error => console.error('Erro:', error));
 
-        fetch('/api/relatorio_faturamento_genero').then(response => response.json()).then(data => {
-            const ctx = document.getElementById('faturamentoGeneroChart').getContext('2d');
-            createChart(ctx, 'pie', {
-                labels: ['Masculino', 'Feminino'],
-                datasets: [{
-                    label: 'Faturamento por Gênero',
-                    data: [data.masculino, data.feminino],
-                    backgroundColor: ['#36A2EB', '#FF6384']
-                }]
-            });
-        });
+            fetch('/api/relatorio_quantidade_produtos_vendidos')
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('quantidadeProdutosVendidos').innerHTML = `Quantidade de Produtos Vendidos: <br><b>R$ ${data.quantidade_produtos_vendidos.toFixed(2)}</b>`;
+    });
 
-        fetch('/api/relatorio_faturamento_produto').then(response => response.json()).then(data => {
-            const ctx = document.getElementById('faturamentoProdutoChart').getContext('2d');
-            const labels = Object.keys(data);
-            const values = Object.values(data);
-            createChart(ctx, 'bar', {
-                labels: labels,
-                datasets: [{
-                    label: 'Faturamento por Produto',
-                    data: values,
-                    backgroundColor: '#FFCE56'
-                }]
-            });
-        });
+fetch('/api/relatorio_valor_medio_produto')
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('valorMedioProduto').innerHTML = `Valor Médio do Produto: <br><b>R$ ${data.valor_medio_produto.toFixed(2)}</b>`;
+    });
 
-        fetch('/api/relatorio_faturamento_localizacao').then(response => response.json()).then(data => {
-            const ctx = document.getElementById('faturamentoLocalizacaoChart').getContext('2d');
-            const labels = Object.keys(data);
-            const values = Object.values(data);
-            createChart(ctx, 'bar', {
-                labels: labels,
-                datasets: [{
-                    label: 'Faturamento por Localização',
-                    data: values,
-                    backgroundColor: '#4BC0C0'
-                }]
-            });
-        });
+        fetch('/api/relatorio_faturamento_produto')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error(data.error);
+                } else {
+                    const ctx = document.getElementById('faturamentoProdutoChart').getContext('2d');
+                    const labels = Object.keys(data);
+                    const values = Object.values(data);
+                    createChart(ctx, 'bar', {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Faturamento por Produto',
+                            data: values,
+                            backgroundColor: '#FFCE56'
+                        }]
+                    });
+                }
+            })
+            .catch(error => console.error('Erro:', error));
 
-        fetch('/api/relatorio_valor_medio_produto').then(response => response.json()).then(data => {
-            document.getElementById('valorMedioProduto').innerHTML = `Valor Médio do Produto: ${data.valor_medio_produto.toFixed(2)}`;
-        });
+        fetch('/api/relatorio_faturamento_localizacao')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error(data.error);
+                } else {
+                    const ctx = document.getElementById('faturamentoLocalizacaoChart').getContext('2d');
+                    const labels = Object.keys(data);
+                    const values = Object.values(data);
+                    createChart(ctx, 'bar', {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Faturamento por Localização',
+                            data: values,
+                            backgroundColor: '#4BC0C0'
+                        }]
+                    });
+                }
+            })
+            .catch(error => console.error('Erro:', error));
 
-        fetch('/api/relatorio_quantidade_produtos_vendidos').then(response => response.json()).then(data => {
-            document.getElementById('quantidadeProdutosVendidos').innerHTML = `Quantidade de Produtos Vendidos: ${data.quantidade_produtos_vendidos}`;
-        });
-
-        fetch('/api/relatorio_faturamento_tempo').then(response => response.json()).then(data => {
-            const ctx = document.getElementById('faturamentoTempoChart').getContext('2d');
-            createChart(ctx, 'line', {
-                labels: data.datas,
-                datasets: [{
-                    label: 'Faturamento ao Longo do Tempo',
-                    data: data.faturamentos,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            });
-        });
+        fetch('/api/relatorio_faturamento_tempo')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error(data.error);
+                } else {
+                    const ctx = document.getElementById('faturamentoTempoChart').getContext('2d');
+                    createChart(ctx, 'line', {
+                        labels: data.datas,
+                        datasets: [{
+                            label: 'Faturamento ao Longo do Tempo',
+                            data: data.faturamentos,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    });
+                }
+            })
+            .catch(error => console.error('Erro:', error));
     </script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
+
 </html>
