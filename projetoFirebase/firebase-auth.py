@@ -37,9 +37,8 @@ def index():
     if(getSession()):
         if 'user' in session:
             # Obter a lista de usuários do Firebase
-            # usuarios = db.child("users").get().val()
-            # return render_template('index.html', usuarios=usuarios)
-            return render_template('index.html')
+            usuarios = db.child("users").get().val()
+            return render_template('index.html', usuarios=usuarios)
         else:
             return redirect(url_for('login'))
     else:
@@ -71,6 +70,7 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        name = request.form['userName']
         email = request.form['email']
         password = request.form['password']
 
@@ -82,7 +82,8 @@ def register():
         
         try:
             auth.create_user_with_email_and_password(email, password)
-            # db.child("users").push({[email]: "testenome"})
+            user = {"email": email, "name": name}
+            db.child("users").push(user)
             return redirect(url_for('login'))
         except:
             error = 'Erro ao registrar. Por favor, tente novamente.'
@@ -336,7 +337,14 @@ def cadastrar_venda():
     
     produto = produtos[produto_id]
     totpedido = produto['preco'] * quantidade
-
+    email = auth.get_account_info(session['user'])['users'][0]['email']
+    usuarios = db.child("users").get().val()
+    try:
+        for key, usuario in usuarios.items():
+            if usuario['email'] == email:
+                nomeUser = usuario['name']
+    except:
+        nomeUser = ""
     # Gerar um ID para a nova venda
     venda_id = len(vendas) + 1
 
@@ -346,7 +354,9 @@ def cadastrar_venda():
         "data": data,
         "produto_id": produto_id,
         "quantidade": quantidade,
-        "totpedido": totpedido
+        "totpedido": totpedido,
+        "emailUser": email,
+        "nomeUser": nomeUser
     }
 
     vendas[f"-NyqERd{venda_id:03d}"] = nova_venda
