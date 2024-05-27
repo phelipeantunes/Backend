@@ -135,6 +135,25 @@
                         <a href="/logout" class="btn btn-danger btn-sair">Sair</a>
                     </div>
                 </div>
+            </div>
+                <!-- Tabela de Usuários -->
+                <h2 class="mt-5">Lista de Usuários</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, usuario in usuarios.items() %}
+                        <tr>
+                            <td>{{ usuario.name }}</td>
+                            <td>{{ usuario.email }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
 
                 POWER BI Simulado
                 <div class="main-content">
