@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import traceback
-import pyrebase
+from pyrebase import pyrebase
 import pandas as pd
 from collections import defaultdict
 
